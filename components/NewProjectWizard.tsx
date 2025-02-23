@@ -33,11 +33,38 @@ const dataSources: DataSourceCard[] = [
 export function NewProjectWizard() {
   const [step, setStep] = useState(1);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
+  const [isConnectionTested, setIsConnectionTested] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<Array<{ email: string; role: string }>>([]);
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("viewer");
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
     name: "",
     shortDescription: "",
     fullDescription: ""
   });
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleTestConnection = () => {
+    // Simulate connection test
+    setTimeout(() => {
+      setIsConnectionTested(true);
+    }, 1000);
+  };
+
+  const handleAddTeamMember = () => {
+    if (isValidEmail(newMemberEmail)) {
+      setTeamMembers([...teamMembers, { email: newMemberEmail, role: newMemberRole }]);
+      setNewMemberEmail("");
+      setNewMemberRole("viewer");
+    }
+  };
+
+  const handleRemoveTeamMember = (email: string) => {
+    setTeamMembers(teamMembers.filter(member => member.email !== email));
+  };
 
   const handleNext = () => {
     if (step === 1 && projectDetails.name.trim()) {
@@ -261,9 +288,20 @@ export function NewProjectWizard() {
               <Input id="password" type="password" className="h-10" />
             </div>
           </div>
-          <div className="flex justify-end pt-4">
-            <Button size="lg">
-              Connect
+          <div className="flex justify-end gap-3 pt-4">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={handleTestConnection}
+            >
+              {isConnectionTested ? "Connection Successful" : "Test Connection"}
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => setStep(4)}
+              disabled={!isConnectionTested}
+            >
+              Next
             </Button>
           </div>
         </div>
@@ -324,11 +362,121 @@ export function NewProjectWizard() {
     );
   };
 
+  const renderTeamInvites = () => (
+    <div className="space-y-8">
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          onClick={() => setStep(3)}
+          size="sm"
+          className="text-muted-foreground hover:text-foreground"
+        >
+          ← Back
+        </Button>
+        <div>
+          <h2 className="text-2xl font-semibold">Invite Team Members</h2>
+          <p className="text-muted-foreground mt-1">Add team members to your project.</p>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <Input
+              type="email"
+              placeholder="team@example.com"
+              value={newMemberEmail}
+              onChange={(e) => setNewMemberEmail(e.target.value)}
+            />
+          </div>
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={newMemberRole}
+            onChange={(e) => setNewMemberRole(e.target.value)}
+          >
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+          </select>
+          <Button
+            onClick={handleAddTeamMember}
+            disabled={!isValidEmail(newMemberEmail)}
+          >
+            Invite
+          </Button>
+        </div>
+
+        {teamMembers.length > 0 && (
+          <div className="rounded-md border">
+            <div className="p-4">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-sm text-muted-foreground">
+                    <th className="font-medium">Email</th>
+                    <th className="font-medium">Role</th>
+                    <th className="font-medium"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamMembers.map((member, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="py-3">{member.email}</td>
+                      <td className="py-3 capitalize">{member.role}</td>
+                      <td className="py-3 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveTeamMember(member.email)}
+                        >
+                          <svg
+                            className="size-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <Button 
+          size="lg"
+          onClick={() => {
+            // Handle project creation
+            const dialog = document.querySelector('[role="dialog"]');
+            if (dialog) {
+              const closeButton = dialog.querySelector('[data-radix-collection-item]');
+              if (closeButton instanceof HTMLElement) {
+                closeButton.click();
+              }
+            }
+          }}
+        >
+          Create Project
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       {step === 1 && renderProjectDetailsForm()}
       {step === 2 && renderDataSourceSelection()}
       {step === 3 && renderDataSourceForm()}
+      {step === 4 && renderTeamInvites()}
     </div>
   );
 }
