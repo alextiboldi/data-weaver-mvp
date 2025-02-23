@@ -2,8 +2,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
+  function onLoginClick() {
+    router.push("/auth/signin");
+    // Google login logic
+  }
+
   return (
     <header className="bg-background border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,7 +42,11 @@ export default function Header() {
           </nav>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Button variant="outline" className="hidden sm:inline-flex">
+            <Button
+              variant="outline"
+              className="hidden sm:inline-flex"
+              onClick={onLoginClick}
+            >
               Log in
             </Button>
             <Button>Sign up</Button>
