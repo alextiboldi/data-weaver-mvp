@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  usage         String?
+  accounts      Account[]
+  sessions      Session[]
+  Project       Project[]
+  ProjectMember ProjectMember[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Project {
+  id               String          @id @default(cuid())
+  name             String
+  dataSource       String
+  connectionConfig Json
+  selectedTables   String[]
+  tables           TableInfo[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  members          ProjectMember[]
+  owner            User            @relation(fields: [ownerId], references: [id])
+  ownerId          String
+  // TableComment     TableComment[]
+  // ColumnComment    ColumnComment[]
+  Query            Query[]
+}
+
+model TableInfo {
+  id          String         @id @default(cuid())
+  project     Project        @relation(fields: [projectId], references: [id])
+  projectId   String
+  tableName   String
+  comment     String?
+  columns     ColumnInfo[]
+  relationships   Relationship[] @relation("SourceTable")
+  reverseRels Relationship[] @relation("TargetTable")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([projectId, tableName])
+}
+
+model ColumnInfo {
+  id        String    @id @default(cuid())
+  table     TableInfo @relation(fields: [tableId], references: [id])
+  tableId   String
+  name      String
+  comment   String?
+  type      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([tableId, name])
+}
+
+model Relationship {
+  id            String    @id @default(cuid())
+  sourceTable   TableInfo @relation("SourceTable", fields: [sourceTableId], references: [id])
+  sourceTableId String
+  sourceColumn  String
+  targetTable   TableInfo @relation("TargetTable", fields: [targetTableId], references: [id])
+  targetTableId String
+  targetColumn  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([sourceTableId, sourceColumn, targetTableId, targetColumn])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  status    String   @default("pending") // pending, accepted
+  role      String   @default("member") // member, admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+}
+
+// model TableComment {
+//   id        String   @id @default(cuid())
+//   projectId String
+//   tableName String
+//   comment   String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   project   Project  @relation(fields: [projectId], references: [id])
+
+//   @@unique([projectId, tableName])
+// }
+
+// model ColumnComment {
+//   id         String   @id @default(cuid())
+//   projectId  String
+//   tableName  String
+//   columnName String
+//   comment    String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+//   project    Project  @relation(fields: [projectId], references: [id])
+
+//   @@unique([projectId, tableName, columnName])
+// }
+
+model Query {
+  id        String   @id @default(cuid())
+  name      String
+  query     String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
