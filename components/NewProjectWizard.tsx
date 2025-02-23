@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -135,20 +134,20 @@ export function NewProjectWizard() {
               <TabsTrigger value="apis">APIs</TabsTrigger>
             </TabsList>
             <TabsContent value="databases" className="mt-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 overflow-y-auto"> {/* Added overflow-y-auto for scrolling */}
                 {dataSources
                   .filter((ds) => ds.type === "database")
                   .map((source) => (
                     <Card
                       key={source.id}
-                      className={`cursor-pointer transition-colors ${
+                      className={`cursor-pointer transition-colors h-[120px] ${
                         selectedSource === source.id
                           ? "border-primary"
                           : "hover:border-primary/50"
                       }`}
                       onClick={() => setSelectedSource(source.id)}
                     >
-                      <CardContent className="flex items-center gap-4 p-4">
+                      <CardContent className="flex items-center gap-4 p-4 h-full">
                         <div className="w-12 h-12 relative">
                           <Image
                             src={source.image}
@@ -169,20 +168,20 @@ export function NewProjectWizard() {
               </div>
             </TabsContent>
             <TabsContent value="files" className="mt-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 overflow-y-auto"> {/* Added overflow-y-auto for scrolling */}
                 {dataSources
                   .filter((ds) => ds.type === "file")
                   .map((source) => (
                     <Card
                       key={source.id}
-                      className={`cursor-pointer transition-colors ${
+                      className={`cursor-pointer transition-colors h-[120px] ${
                         selectedSource === source.id
                           ? "border-primary"
                           : "hover:border-primary/50"
                       }`}
                       onClick={() => setSelectedSource(source.id)}
                     >
-                      <CardContent className="flex items-center gap-4 p-4">
+                      <CardContent className="flex items-center gap-4 p-4 h-full">
                         <div className="w-12 h-12 relative">
                           <Image
                             src={source.image}
