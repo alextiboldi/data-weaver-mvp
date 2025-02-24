@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { Table } from "@/lib/types";
 import { Client } from "pg";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export async function POST(request: Request) {
   try {
@@ -80,7 +81,7 @@ ORDER BY c.table_name, c.ordinal_position;
     const result = await client.query(tableInfoQuery, [
       data.connection.schema || "public",
     ]);
-    console.log("Got result");
+
     // Group results by table
     const tables = result.rows.reduce((acc, row) => {
       let table = acc.find((t) => t.tableName === row.table_name);
@@ -115,17 +116,28 @@ ORDER BY c.table_name, c.ordinal_position;
       return acc;
     }, []);
 
+    await prisma.project.updateMany({
+      where: {
+        ownerId: "cm7j5e16u0000cy28xs1hdemx",
+        isSelected: true,
+      },
+      data: {
+        isSelected: false,
+      },
+    });
+
     const project = await prisma.project.create({
       data: {
-        ownerId: "cm7dk3t5r0000cy6vou7nf4b3", // You should get this from the session
+        ownerId: "cm7j5e16u0000cy28xs1hdemx", // You should get this from the session
         name: data.name,
         shortDescription: data.shortDescription,
         description: data.description,
         dataSource: data.dataSource,
         connectionConfig: data.connection,
+        isSelected: true,
         tables: {
           create: Object.values(tables).map((table: any) => ({
-            tableName: table.tableName,
+            name: table.tableName,
             comment: table.comment,
             columns: {
               create: table.columns.map((column: any) => ({
@@ -152,12 +164,12 @@ ORDER BY c.table_name, c.ordinal_position;
     // Create relationships after tables are created
     for (const tableInfo of tables) {
       const sourceTable = project.tables.find(
-        (t) => t.tableName === tableInfo.tableName
+        (t) => t.name === tableInfo.tableName
       );
       // console.log("Source Table", sourceTable);
       for (const relationship of tableInfo.relationships || []) {
         const targetTable = project.tables.find(
-          (t) => t.tableName === relationship.targetTable
+          (t) => t.name === relationship.targetTable
         );
 
         if (sourceTable && targetTable) {
@@ -174,9 +186,10 @@ ORDER BY c.table_name, c.ordinal_position;
     }
     // console.log("Project", JSON.stringify(project, null, 2));
 
-    return NextResponse.json(project);
+    // return NextResponse.json(project);
   } catch (error) {
     console.log(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  redirect("/dashboard");
 }

@@ -28,8 +28,7 @@ import Link from "next/link";
 
 export function NavMain() {
   const { selectedProject, availableProjects } = useStore();
-  console.log("Selected Project in NavMain", selectedProject);
-  console.log("Available Projects in NavMain", availableProjects);
+
   const menu = [
     {
       title: "Playground",

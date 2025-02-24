@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -11,13 +10,13 @@ export async function GET() {
         shortDescription: true,
       },
       where: {
-        ownerId: "cm7dk3t5r0000cy6vou7nf4b3",
+        ownerId: "cm7j5e16u0000cy28xs1hdemx",
       },
     });
 
     const dbSelectedProject = await prisma.project.findFirst({
       where: {
-        ownerId: "cm7dk3t5r0000cy6vou7nf4b3",
+        ownerId: "cm7j5e16u0000cy28xs1hdemx",
         isSelected: true,
       },
       include: {
@@ -37,6 +36,9 @@ export async function GET() {
 
     return NextResponse.json({ dbProjectInfo, dbSelectedProject });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 }
+    );
   }
 }
