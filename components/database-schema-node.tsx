@@ -14,13 +14,8 @@ export function DatabaseSchemaNode({
   data,
   selected,
 }: NodeProps<DatabaseSchemaNode>) {
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   return (
-    <BaseNode className="p-0" selected={selected} onContextMenu={handleContextMenu}>
+    <BaseNode className="p-0" selected={selected}>
       <h2 className="rounded-tl-md rounded-tr-md bg-secondary p-2 text-center text-sm text-muted-foreground">
         {data.label}
       </h2>

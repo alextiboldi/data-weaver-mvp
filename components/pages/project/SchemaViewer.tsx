@@ -61,14 +61,17 @@ function createNodesAndEdges(project: Project) {
 
 export default function SchemaViewer({ project }: { project: Project }) {
   const { nodes, edges } = createNodesAndEdges(project);
+  const defaultViewport = { x: 0, y: 0, zoom: 1 }; // Added default viewport
 
   return (
     <div className="h-full w-full">
       <ReactFlow
-        defaultNodes={nodes}
-        defaultEdges={edges}
+        nodes={nodes}
+        edges={edges}
         nodeTypes={nodeTypes}
+        defaultViewport={defaultViewport}
         fitView
+        onNodeContextMenu={(e) => e.preventDefault()}
       >
         <Background />
       </ReactFlow>
