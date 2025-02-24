@@ -33,38 +33,8 @@ export default function DataPage({
 
   if (!selectedProject) return <div>Loading...</div>;
 
-  const [searchTerm, setSearchTerm] = useState("");
-
-const handleSearch = async (value: string) => {
-  setSearchTerm(value);
-  // Update node styles based on search term
-  if (project?.tables) {
-    const updatedNodes = project.tables.map(table => {
-      const hasMatch = table.columns.some(col => 
-        col.name.toLowerCase().includes(value.toLowerCase()) ||
-        (tableData[table.tableName]?.some(row => 
-          Object.values(row).some(cellValue => 
-            String(cellValue).toLowerCase().includes(value.toLowerCase())
-          )
-        ))
-      );
-      
-      return {
-        ...table,
-        style: hasMatch ? { border: '2px solid #3b82f6', boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)' } : {}
-      };
-    });
-    
-    // Update your nodes state here
-    // This depends on how you're managing state in SchemaViewer
-  }
-};
-
-return (
+  return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b">
-        <SearchBar onSearch={handleSearch} />
-      </div>
       <div className="flex-1 min-h-0">
         <SchemaViewer
           project={selectedProject}
