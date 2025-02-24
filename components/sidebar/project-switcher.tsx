@@ -1,12 +1,9 @@
+
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ChevronsUpDown, Plus, Database } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,17 +21,20 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export function ProjectSwitcher({
-  projects,
+  initialProjects,
 }: {
-  projects: {
-    name: string;
-    icon: React.ElementType;
-    shortDescription: string;
-  }[];
+  initialProjects: Project[];
 }) {
   const { isMobile } = useSidebar();
-  const [activeProject, setActiveProject] = React.useState(projects[0]);
+  const [projects, setProjects] = React.useState(initialProjects);
+  const [activeProject, setActiveProject] = React.useState(projects[0] || null);
 
   return (
     <SidebarMenu>
@@ -46,14 +46,14 @@ export function ProjectSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeProject.icon className="size-4" />
+                <Database className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeProject.name}
+                  {activeProject?.name || "No Project"}
                 </span>
                 <span className="truncate text-xs">
-                  {activeProject.shortDescription}
+                  {activeProject?.description || "Select a project"}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -70,12 +70,12 @@ export function ProjectSwitcher({
             </DropdownMenuLabel>
             {projects.map((project, index) => (
               <DropdownMenuItem
-                key={project.name}
+                key={project.id}
                 onClick={() => setActiveProject(project)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <project.icon className="size-4 shrink-0" />
+                  <Database className="size-4 shrink-0" />
                 </div>
                 {project.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
