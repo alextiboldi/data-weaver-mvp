@@ -65,6 +65,7 @@ model Project {
   connectionConfig Json
   selectedTables   String[]
   tables           TableInfo[]
+  isSelected       Boolean         @default(false)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   members          ProjectMember[]
@@ -72,7 +73,7 @@ model Project {
   ownerId          String
   // TableComment     TableComment[]
   // ColumnComment    ColumnComment[]
-  Query            Query[]
+  queries            Query[]
 }
 
 model TableInfo {

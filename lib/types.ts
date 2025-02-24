@@ -1,3 +1,9 @@
+export type ProjectInfo = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -14,7 +20,7 @@ export type TableRelation = {
   sourceColumn: string;
   targetTable: string;
   targetColumn: string;
-  relationType: 'PRIMARY KEY' | 'FOREIGN KEY' | 'NONE';
+  relationType: "PRIMARY KEY" | "FOREIGN KEY" | "NONE";
 };
 export type Query = {
   id: string;

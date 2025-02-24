@@ -5,8 +5,7 @@ import { getSession } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { Table } from "@/lib/types";
 import { Client } from "pg";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {

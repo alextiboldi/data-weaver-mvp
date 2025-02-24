@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import {
+  BookOpen,
+  ChevronRight,
+  Settings2,
+  SquareTerminal,
+  type LucideIcon,
+} from "lucide-react";
 
 import {
   Collapsible,
@@ -17,26 +23,108 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import useStore from "@/store/app-store";
+import Link from "next/link";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+export function NavMain() {
+  const { selectedProject, availableProjects } = useStore();
+  console.log("Selected Project in NavMain", selectedProject);
+  console.log("Available Projects in NavMain", availableProjects);
+  const menu = [
+    {
+      title: "Playground",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Schema",
+          url: `/dashboard/schema`,
+        },
+        {
+          title: "Query",
+          url: "#",
+        },
+        {
+          title: "Settings",
+          url: "#",
+        },
+      ],
+    },
+    // {
+    //   title: "Models",
+    //   url: "#",
+    //   icon: Bot,
+    //   items: [
+    //     {
+    //       title: "Genesis",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Explorer",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Quantum",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
+    {
+      title: "Documentation",
+      url: "#",
+      icon: BookOpen,
+      isActive: false,
+      items: [
+        {
+          title: "Dictionary",
+          url: "#",
+        },
+        {
+          title: "Get Started",
+          url: "#",
+        },
+        {
+          title: "Tutorials",
+          url: "#",
+        },
+        {
+          title: "Changelog",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+      isActive: false,
+      items: [
+        {
+          title: "General",
+          url: "#",
+        },
+        {
+          title: "Team",
+          url: "#",
+        },
+        {
+          title: "Billing",
+          url: "#",
+        },
+        {
+          title: "Limits",
+          url: "#",
+        },
+      ],
+    },
+  ];
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
-        {items.map((item) => (
+        {menu.map((item) => (
           <Collapsible
             key={item.title}
             asChild
@@ -56,9 +144,9 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
+                        <Link href={subItem.url}>
                           <span>{subItem.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -21,22 +20,15 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import useStore from "@/store/app-store";
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-}
-
-export function ProjectSwitcher({
-  initialProjects,
-}: {
-  initialProjects: Project[];
-}) {
+export function ProjectSwitcher() {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const [projects, setProjects] = React.useState(initialProjects);
-  const [activeProject, setActiveProject] = React.useState(projects[0] || null);
+  const { availableProjects } = useStore();
+  const [activeProject, setActiveProject] = React.useState(
+    availableProjects[0] || null
+  );
 
   return (
     <SidebarMenu>
@@ -70,7 +62,7 @@ export function ProjectSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Projects
             </DropdownMenuLabel>
-            {projects.map((project, index) => (
+            {availableProjects.map((project, index) => (
               <DropdownMenuItem
                 key={project.id}
                 onClick={() => {
@@ -89,7 +81,10 @@ export function ProjectSwitcher({
             <DropdownMenuSeparator />
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem
+                  className="gap-2 p-2"
+                  onSelect={(e) => e.preventDefault()}
+                >
                   <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                     <Plus className="size-4" />
                   </div>
