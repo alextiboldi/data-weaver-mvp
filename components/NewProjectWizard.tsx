@@ -86,14 +86,31 @@ export function NewProjectWizard() {
     setIsTestingConnection(true);
     setConnectionError(null);
     try {
-      const response = await fetch("/api/test-connection"); // Placeholder API call
+      const response = await fetch("/api/database/test-connection", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          host: connectionDetails.server,
+          port: connectionDetails.port,
+          user: connectionDetails.user,
+          password: connectionDetails.password,
+          database: connectionDetails.database,
+          schema: connectionDetails.schema,
+        }),
+      });
+      
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(data.error || `Connection failed: ${response.status}`);
       }
+      
       setIsConnectionTested(true);
       setIsTestingConnection(false);
-    } catch (error) {
-      setConnectionError("Connection failed! Please check your settings.");
+    } catch (error: any) {
+      setConnectionError(error.message || "Connection failed! Please check your settings.");
       setIsTestingConnection(false);
     }
   };
