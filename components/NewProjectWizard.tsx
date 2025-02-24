@@ -70,12 +70,12 @@ export function NewProjectWizard() {
     fullDescription: "",
   });
   const [connectionDetails, setConnectionDetails] = useState({
-    server: "",
-    port: "",
-    database: "",
-    schema: "public",
-    user: "",
-    password: "",
+    server: "localhost",
+    port: "3306",
+    database: "data-playground",
+    schema: "onesource",
+    user: "alext",
+    password: "p0XcEoAJoIpmSU",
   });
 
   const isValidEmail = (email: string) => {
@@ -100,17 +100,19 @@ export function NewProjectWizard() {
           schema: connectionDetails.schema,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || `Connection failed: ${response.status}`);
       }
-      
+
       setIsConnectionTested(true);
       setIsTestingConnection(false);
     } catch (error: any) {
-      setConnectionError(error.message || "Connection failed! Please check your settings.");
+      setConnectionError(
+        error.message || "Connection failed! Please check your settings."
+      );
       setIsTestingConnection(false);
     }
   };
@@ -337,60 +339,90 @@ export function NewProjectWizard() {
           <div className="grid gap-6 max-w-2xl">
             <div className="grid gap-2">
               <Label htmlFor="server">Server</Label>
-              <Input 
-                id="server" 
-                placeholder="0.0.0.0" 
-                className="h-10" 
+              <Input
+                id="server"
+                placeholder="0.0.0.0"
+                className="h-10"
                 value={connectionDetails.server}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, server: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    server: e.target.value,
+                  }))
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="port">Port</Label>
-              <Input 
-                id="port" 
-                placeholder="5432" 
-                className="h-10" 
+              <Input
+                id="port"
+                placeholder="5432"
+                className="h-10"
                 value={connectionDetails.port}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, port: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    port: e.target.value,
+                  }))
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="database">Database Name</Label>
-              <Input 
-                id="database" 
-                className="h-10" 
+              <Input
+                id="database"
+                className="h-10"
                 value={connectionDetails.database}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, database: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    database: e.target.value,
+                  }))
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="schema">Schema</Label>
-              <Input 
-                id="schema" 
-                placeholder="public" 
-                className="h-10" 
+              <Input
+                id="schema"
+                placeholder="public"
+                className="h-10"
                 value={connectionDetails.schema}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, schema: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    schema: e.target.value,
+                  }))
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="user">User</Label>
-              <Input 
-                id="user" 
-                className="h-10" 
+              <Input
+                id="user"
+                className="h-10"
                 value={connectionDetails.user}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, user: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    user: e.target.value,
+                  }))
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                className="h-10" 
+              <Input
+                id="password"
+                type="password"
+                className="h-10"
                 value={connectionDetails.password}
-                onChange={(e) => setConnectionDetails(prev => ({...prev, password: e.target.value}))}
+                onChange={(e) =>
+                  setConnectionDetails((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>
@@ -408,9 +440,7 @@ export function NewProjectWizard() {
                 : "Test Connection"}
             </Button>
             {connectionError && (
-              <div className="text-red-500 text-sm mt-2">
-                {connectionError}
-              </div>
+              <div className="text-red-500 text-sm mt-2">{connectionError}</div>
             )}
             <Button
               size="lg"
@@ -577,10 +607,10 @@ export function NewProjectWizard() {
           size="lg"
           onClick={async () => {
             try {
-              const response = await fetch('/api/projects/create', {
-                method: 'POST',
+              const response = await fetch("/api/projects/create", {
+                method: "POST",
                 headers: {
-                  'Content-Type': 'application/json',
+                  "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                   name: projectDetails.name,
@@ -600,7 +630,7 @@ export function NewProjectWizard() {
               });
 
               if (!response.ok) {
-                throw new Error('Failed to create project');
+                throw new Error("Failed to create project");
               }
 
               const dialog = document.querySelector('[role="dialog"]');
@@ -613,7 +643,7 @@ export function NewProjectWizard() {
                 }
               }
             } catch (error) {
-              console.error('Error creating project:', error);
+              console.error("Error creating project:", error);
               // You might want to show an error message to the user here
             }
           }}

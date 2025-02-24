@@ -22,13 +22,14 @@ export async function POST(request: Request) {
     const client = new Client({
       host: data.connection.host,
       port: parseInt(data.connection.port),
-      user: data.connection.username,
+      user: data.connection.user,
       password: data.connection.password,
       database: data.connection.database,
       schema: data.connection.schema,
     });
 
     await client.connect();
+    console.log("Connected");
 
     // Get table list and column information
     const tableInfoQuery = `
@@ -80,18 +81,21 @@ ORDER BY c.table_name, c.ordinal_position;
     const result = await client.query(tableInfoQuery, [
       data.connection.schema || "public",
     ]);
-
+    console.log("Got result");
     // Group results by table
     const tables = result.rows.reduce((acc, row) => {
-      if (!acc[row.table_name]) {
-        acc[row.table_name] = {
+      let table = acc.find((t) => t.tableName === row.table_name);
+      if (!table) {
+        table = {
           tableName: row.table_name,
           comment: row.table_comment,
           columns: [],
+          relationships: [],
         };
+        acc.push(table);
       }
-      
-      acc[row.table_name].columns.push({
+
+      table.columns.push({
         name: row.column_name,
         type: row.data_type,
         columnSize: row.column_size,
@@ -99,9 +103,18 @@ ORDER BY c.table_name, c.ordinal_position;
         isPrimaryKey: row.is_primary_key,
         isForeignKey: row.is_foreign_key,
       });
-      
+
+      // Add relationship if it's a foreign key
+      if (row.is_foreign_key) {
+        table.relationships.push({
+          sourceColumn: row.column_name,
+          targetTable: row.referenced_table,
+          targetColumn: row.referenced_column,
+        });
+      }
+
       return acc;
-    }, {});
+    }, []);
 
     const project = await prisma.project.create({
       data: {
@@ -138,11 +151,11 @@ ORDER BY c.table_name, c.ordinal_position;
     });
 
     // Create relationships after tables are created
-    for (const tableInfo of data.tables) {
+    for (const tableInfo of tables) {
       const sourceTable = project.tables.find(
-        (t) => t.tableName === tableInfo.name
+        (t) => t.tableName === tableInfo.tableName
       );
-
+      // console.log("Source Table", sourceTable);
       for (const relationship of tableInfo.relationships || []) {
         const targetTable = project.tables.find(
           (t) => t.tableName === relationship.targetTable
@@ -160,6 +173,7 @@ ORDER BY c.table_name, c.ordinal_position;
         }
       }
     }
+    // console.log("Project", JSON.stringify(project, null, 2));
 
     return NextResponse.json(project);
   } catch (error) {
