@@ -69,6 +69,14 @@ export function NewProjectWizard() {
     shortDescription: "",
     fullDescription: "",
   });
+  const [connectionDetails, setConnectionDetails] = useState({
+    server: "",
+    port: "",
+    database: "",
+    schema: "public",
+    user: "",
+    password: "",
+  });
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -312,27 +320,61 @@ export function NewProjectWizard() {
           <div className="grid gap-6 max-w-2xl">
             <div className="grid gap-2">
               <Label htmlFor="server">Server</Label>
-              <Input id="server" placeholder="0.0.0.0" className="h-10" />
+              <Input 
+                id="server" 
+                placeholder="0.0.0.0" 
+                className="h-10" 
+                value={connectionDetails.server}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, server: e.target.value}))}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="port">Port</Label>
-              <Input id="port" placeholder="5432" className="h-10" />
+              <Input 
+                id="port" 
+                placeholder="5432" 
+                className="h-10" 
+                value={connectionDetails.port}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, port: e.target.value}))}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="database">Database Name</Label>
-              <Input id="database" className="h-10" />
+              <Input 
+                id="database" 
+                className="h-10" 
+                value={connectionDetails.database}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, database: e.target.value}))}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="schema">Schema</Label>
-              <Input id="schema" placeholder="public" className="h-10" />
+              <Input 
+                id="schema" 
+                placeholder="public" 
+                className="h-10" 
+                value={connectionDetails.schema}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, schema: e.target.value}))}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="user">User</Label>
-              <Input id="user" className="h-10" />
+              <Input 
+                id="user" 
+                className="h-10" 
+                value={connectionDetails.user}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, user: e.target.value}))}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" className="h-10" />
+              <Input 
+                id="password" 
+                type="password" 
+                className="h-10" 
+                value={connectionDetails.password}
+                onChange={(e) => setConnectionDetails(prev => ({...prev, password: e.target.value}))}
+              />
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -529,12 +571,12 @@ export function NewProjectWizard() {
                   description: projectDetails.fullDescription,
                   dataSource: selectedSource,
                   connection: {
-                    host: (document.getElementById('server') as HTMLInputElement).value,
-                    port: (document.getElementById('port') as HTMLInputElement).value,
-                    user: (document.getElementById('user') as HTMLInputElement).value,
-                    password: (document.getElementById('password') as HTMLInputElement).value,
-                    database: (document.getElementById('database') as HTMLInputElement).value,
-                    schema: (document.getElementById('schema') as HTMLInputElement).value || 'public',
+                    host: connectionDetails.server,
+                    port: connectionDetails.port,
+                    user: connectionDetails.user,
+                    password: connectionDetails.password,
+                    database: connectionDetails.database,
+                    schema: connectionDetails.schema,
                   },
                   teamMembers,
                 }),
