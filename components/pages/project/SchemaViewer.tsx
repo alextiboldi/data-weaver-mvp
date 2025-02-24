@@ -1,9 +1,14 @@
 "use client";
 
+import React from "react";
 import { Background, Edge, ReactFlow } from "@xyflow/react";
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import "@xyflow/react/dist/style.css";
 import { Project } from "@/lib/types";
+
+const nodeTypes = {
+  databaseSchema: DatabaseSchemaNode,
+} as const;
 
 // type ProjectWithRelations = Project & {
 //   tables: Array<{
@@ -54,22 +59,8 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
-const DEFAULT_NODE_TYPES = {
-  databaseSchema: DatabaseSchemaNode,
-} as const;
-
-export default function SchemaViewer({ 
-  project,
-  nodeTypes: customNodeTypes 
-}: { 
-  project: Project;
-  nodeTypes?: Record<string, any>;
-}) {
+export default function SchemaViewer({ project }: { project: Project }) {
   const { nodes, edges } = createNodesAndEdges(project);
-  const nodeTypes = React.useMemo(
-    () => ({ ...DEFAULT_NODE_TYPES, ...customNodeTypes }),
-    [customNodeTypes]
-  );
 
   return (
     <div className="h-full w-full">
