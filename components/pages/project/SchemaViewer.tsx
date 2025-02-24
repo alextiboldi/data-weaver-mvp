@@ -3,81 +3,69 @@
 import { Background, Edge, ReactFlow } from "@xyflow/react";
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import "@xyflow/react/dist/style.css";
-const defaultNodes = [
-  {
-    id: "1",
-    position: { x: 0, y: 0 },
-    type: "databaseSchema",
-    data: {
-      label: "Products",
-      schema: [
-        { title: "id", type: "uuid" },
-        { title: "name", type: "varchar" },
-        { title: "description", type: "varchar" },
-        { title: "warehouse_id", type: "uuid" },
-        { title: "supplier_id", type: "uuid" },
-        { title: "price", type: "money" },
-        { title: "quantity", type: "int4" },
-      ],
-    },
-  },
-  {
-    id: "2",
-    position: { x: 350, y: -100 },
-    type: "databaseSchema",
-    data: {
-      label: "Warehouses",
-      schema: [
-        { title: "id", type: "uuid" },
-        { title: "name", type: "varchar" },
-        { title: "address", type: "varchar" },
-        { title: "capacity", type: "int4" },
-      ],
-    },
-  },
-  {
-    id: "3",
-    position: { x: 350, y: 200 },
-    type: "databaseSchema",
-    data: {
-      label: "Suppliers",
-      schema: [
-        { title: "id", type: "uuid" },
-        { title: "name", type: "varchar" },
-        { title: "description", type: "varchar" },
-        { title: "country", type: "varchar" },
-      ],
-    },
-  },
-];
+import { Project } from "@prisma/client";
 
-const defaultEdges: Edge[] = [
-  {
-    id: "products-warehouses",
-    source: "1",
-    target: "2",
-    sourceHandle: "warehouse_id",
-    targetHandle: "id",
-  },
-  {
-    id: "products-suppliers",
-    source: "1",
-    target: "3",
-    sourceHandle: "supplier_id",
-    targetHandle: "id",
-  },
-];
+type ProjectWithRelations = Project & {
+  tables: Array<{
+    id: string;
+    tableName: string;
+    columns: Array<{
+      id: string;
+      name: string;
+      type: string;
+      isPrimaryKey: boolean;
+    }>;
+    relationships: Array<{
+      id: string;
+      sourceColumn: string;
+      targetTable: {
+        id: string;
+        tableName: string;
+      };
+      targetColumn: string;
+    }>;
+  }>;
+};
+
+function createNodesAndEdges(project: ProjectWithRelations) {
+  const nodes = project.tables.map((table, index) => ({
+    id: table.id,
+    position: { x: index * 350, y: index % 2 === 0 ? 0 : 200 },
+    type: "databaseSchema" as const,
+    data: {
+      label: table.tableName,
+      schema: table.columns.map(column => ({
+        title: column.name,
+        type: column.type,
+      })),
+    },
+  }));
+
+  const edges: Edge[] = project.tables.flatMap(table =>
+    table.relationships.map(rel => ({
+      id: rel.id,
+      source: table.id,
+      target: rel.targetTable.id,
+      sourceHandle: rel.sourceColumn,
+      targetHandle: rel.targetColumn,
+    }))
+  );
+
+  return { nodes, edges };
+}
 
 const nodeTypes = {
   databaseSchema: DatabaseSchemaNode,
 };
 
-export default function SchemaViewer() {
+export default function SchemaViewer({ project }: { project: ProjectWithRelations }) {
+  const { nodes, edges } = createNodesAndEdges(project);
+
   return (
     <div className="h-full w-full">
       <ReactFlow
-        defaultNodes={defaultNodes}
-        defaultEdges={defaultEdges}
+        defaultNodes={nodes}
+        defaultEdges={edges}
         nodeTypes={nodeTypes}
         fitView
       >
