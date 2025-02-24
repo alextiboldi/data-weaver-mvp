@@ -57,6 +57,8 @@ export function NewProjectWizard() {
   const [step, setStep] = useState(1);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [isConnectionTested, setIsConnectionTested] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [teamMembers, setTeamMembers] = useState<
     Array<{ email: string; role: string }>
   >([]);
@@ -72,11 +74,20 @@ export function NewProjectWizard() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleTestConnection = () => {
-    // Simulate connection test
-    setTimeout(() => {
+  const handleTestConnection = async () => {
+    setIsTestingConnection(true);
+    setConnectionError(null);
+    try {
+      const response = await fetch("/api/test-connection"); // Placeholder API call
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       setIsConnectionTested(true);
-    }, 1000);
+      setIsTestingConnection(false);
+    } catch (error) {
+      setConnectionError("Connection failed! Please check your settings.");
+      setIsTestingConnection(false);
+    }
   };
 
   const handleAddTeamMember = () => {
@@ -325,9 +336,23 @@ export function NewProjectWizard() {
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" size="lg" onClick={handleTestConnection}>
-              {isConnectionTested ? "Connection Successful" : "Test Connection"}
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleTestConnection}
+              disabled={isTestingConnection}
+            >
+              {isTestingConnection
+                ? "Testing..."
+                : isConnectionTested
+                ? "Connection Successful"
+                : "Test Connection"}
             </Button>
+            {connectionError && (
+              <div className="text-red-500 text-sm mt-2">
+                {connectionError}
+              </div>
+            )}
             <Button
               size="lg"
               onClick={() => setStep(4)}
