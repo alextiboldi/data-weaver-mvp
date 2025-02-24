@@ -54,9 +54,9 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
-const nodeTypes = {
+const DEFAULT_NODE_TYPES = {
   databaseSchema: DatabaseSchemaNode,
-};
+} as const;
 
 export default function SchemaViewer({ 
   project,
@@ -66,14 +66,17 @@ export default function SchemaViewer({
   nodeTypes?: Record<string, any>;
 }) {
   const { nodes, edges } = createNodesAndEdges(project);
-  const mergedNodeTypes = { ...nodeTypes, ...customNodeTypes };
+  const nodeTypes = React.useMemo(
+    () => ({ ...DEFAULT_NODE_TYPES, ...customNodeTypes }),
+    [customNodeTypes]
+  );
 
   return (
     <div className="h-full w-full">
       <ReactFlow
         defaultNodes={nodes}
         defaultEdges={edges}
-        nodeTypes={mergedNodeTypes}
+        nodeTypes={nodeTypes}
         fitView
       >
         <Background />
