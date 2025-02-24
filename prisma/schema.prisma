@@ -80,7 +80,7 @@ model TableInfo {
   id          String         @id @default(cuid())
   project     Project        @relation(fields: [projectId], references: [id])
   projectId   String
-  name   String
+  tableName   String
   comment     String?
   columns     ColumnInfo[]
   relationships   Relationship[] @relation("SourceTable")
@@ -88,7 +88,7 @@ model TableInfo {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
-  @@unique([projectId, name])
+  @@unique([projectId, tableName])
 }
 
 model ColumnInfo {

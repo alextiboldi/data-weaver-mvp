@@ -1,6 +1,7 @@
-
 import { Node, NodeProps, Position } from "@xyflow/react";
+
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
+
 import { BaseNode } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 
@@ -15,6 +16,7 @@ export function DatabaseSchemaNode({
 }: NodeProps<DatabaseSchemaNode>) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
@@ -22,6 +24,7 @@ export function DatabaseSchemaNode({
       <h2 className="rounded-tl-md rounded-tr-md bg-secondary p-2 text-center text-sm text-muted-foreground">
         {data.label}
       </h2>
+      {/* shadcn Table cannot be used because of hardcoded overflow-auto */}
       <table className="border-spacing-10 overflow-visible">
         <TableBody>
           {data.schema.map((entry) => (

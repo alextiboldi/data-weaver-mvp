@@ -40,20 +40,18 @@ export default function DataPage({
           project={selectedProject}
           nodeTypes={{
             databaseSchema: (props: any) => (
-              <div onContextMenu={(e) => e.preventDefault()}>
-                <TableContextMenu 
-                  onViewData={() => handleTableClick({
-                    id: props.id,
-                    name: props.data.label,
-                    columns: props.data.schema.map((s: any) => ({
-                      name: s.title,
-                      type: s.type
-                    }))
-                  })}
-                >
-                  {props.children}
-                </TableContextMenu>
-              </div>
+              <TableContextMenu 
+                onViewData={() => handleTableClick({
+                  id: props.id,
+                  name: props.data.label,
+                  columns: props.data.schema.map((s: any) => ({
+                    name: s.title,
+                    type: s.type
+                  }))
+                })}
+              >
+                {props.children}
+              </TableContextMenu>
             ),
           }}
         />
