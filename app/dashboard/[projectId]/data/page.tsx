@@ -18,16 +18,17 @@ export default function DataPage({
 
   const handleTableClick = async (table: Table) => {
     setSelectedTable(table);
-    // Here you would fetch the actual data from your API
-    // This is a placeholder that creates mock data
-    const mockData = Array.from({ length: 10 }).map((_, i) => {
-      const row: any = {};
-      table.columns.forEach((col) => {
-        row[col.name] = `${col.name}_${i}`;
-      });
-      return row;
-    });
-    setTableData(mockData);
+    try {
+      const response = await fetch(`/api/projects/${params.projectId}/tables/${table.name}/data`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch table data');
+      }
+      const { data } = await response.json();
+      setTableData(data);
+    } catch (error) {
+      console.error('Error fetching table data:', error);
+      setTableData([]);
+    }
   };
 
   if (!selectedProject) return <div>Loading...</div>;
