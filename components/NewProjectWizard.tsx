@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +63,8 @@ export function NewProjectWizard() {
   const [teamMembers, setTeamMembers] = useState<
     Array<{ email: string; role: string }>
   >([]);
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [projectError, setProjectError] = useState<string | null>(null);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("viewer");
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
@@ -603,9 +606,13 @@ export function NewProjectWizard() {
       </div>
 
       <div className="flex justify-end pt-4">
-        <Button
+        <LoadingButton
           size="lg"
+          text="Create Project"
+          loadingText="Creating Project..."
+          isLoading={isCreatingProject}
           onClick={async () => {
+            setIsCreatingProject(true);
             try {
               const response = await fetch("/api/projects/create", {
                 method: "POST",
@@ -633,10 +640,11 @@ export function NewProjectWizard() {
                 throw new Error("Failed to create project");
               }
 
+              // Close the dialog using Radix's close method
               const dialog = document.querySelector('[role="dialog"]');
               if (dialog) {
                 const closeButton = dialog.querySelector(
-                  "[data-radix-collection-item]"
+                  '[data-radix-collection-item]'
                 );
                 if (closeButton instanceof HTMLElement) {
                   closeButton.click();
@@ -644,12 +652,15 @@ export function NewProjectWizard() {
               }
             } catch (error) {
               console.error("Error creating project:", error);
-              // You might want to show an error message to the user here
+              setProjectError("Failed to create project. Please try again.");
+            } finally {
+              setIsCreatingProject(false);
             }
           }}
-        >
-          Create Project
-        </Button>
+        />
+        {projectError && (
+          <div className="text-red-500 text-sm mt-2">{projectError}</div>
+        )}
       </div>
     </div>
   );
