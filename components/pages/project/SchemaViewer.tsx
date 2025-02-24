@@ -59,15 +59,16 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
-export default function SchemaViewer({ project }: { project: Project }) {
+export default function SchemaViewer({ project, nodeTypes: customNodeTypes }: { project: Project, nodeTypes?: any }) {
   const { nodes, edges } = createNodesAndEdges(project);
+  const mergedNodeTypes = { ...nodeTypes, ...customNodeTypes };
 
   return (
     <div className="h-full w-full">
       <ReactFlow
         defaultNodes={nodes}
         defaultEdges={edges}
-        nodeTypes={nodeTypes}
+        nodeTypes={mergedNodeTypes}
         fitView
       >
         <Background />
