@@ -59,6 +59,8 @@ model VerificationToken {
 model Project {
   id               String          @id @default(cuid())
   name             String
+  shortDescription String?
+  description      String?
   dataSource       String
   connectionConfig Json
   selectedTables   String[]

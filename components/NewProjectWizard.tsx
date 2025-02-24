@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,23 +23,49 @@ interface ProjectDetails {
 }
 
 const dataSources: DataSourceCard[] = [
-  { id: "postgres", label: "PostgreSQL", name: "postgres", image: "/postgres.svg", type: "database" },
-  { id: "mssql", label: "Microsoft SQL", name: "mssql", image: "/mssql.svg", type: "database" },
-  { id: "csv", label: "CSV File", name: "csv", image: "/csv.svg", type: "file" },
-  { id: "json", label: "JSON File", name: "json", image: "/json.svg", type: "file" },
+  {
+    id: "postgres",
+    label: "PostgreSQL",
+    name: "postgres",
+    image: "/postgres.svg",
+    type: "database",
+  },
+  {
+    id: "mssql",
+    label: "Microsoft SQL",
+    name: "mssql",
+    image: "/mssql.svg",
+    type: "database",
+  },
+  {
+    id: "csv",
+    label: "CSV File",
+    name: "csv",
+    image: "/csv.svg",
+    type: "file",
+  },
+  {
+    id: "json",
+    label: "JSON File",
+    name: "json",
+    image: "/json.svg",
+    type: "file",
+  },
 ];
 
 export function NewProjectWizard() {
   const [step, setStep] = useState(1);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [isConnectionTested, setIsConnectionTested] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<Array<{ email: string; role: string }>>([]);
+  const [teamMembers, setTeamMembers] = useState<
+    Array<{ email: string; role: string }>
+  >([]);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("viewer");
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
     name: "",
     shortDescription: "",
-    fullDescription: ""
+    fullDescription: "",
   });
 
   const isValidEmail = (email: string) => {
@@ -56,14 +81,17 @@ export function NewProjectWizard() {
 
   const handleAddTeamMember = () => {
     if (isValidEmail(newMemberEmail)) {
-      setTeamMembers([...teamMembers, { email: newMemberEmail, role: newMemberRole }]);
+      setTeamMembers([
+        ...teamMembers,
+        { email: newMemberEmail, role: newMemberRole },
+      ]);
       setNewMemberEmail("");
       setNewMemberRole("viewer");
     }
   };
 
   const handleRemoveTeamMember = (email: string) => {
-    setTeamMembers(teamMembers.filter(member => member.email !== email));
+    setTeamMembers(teamMembers.filter((member) => member.email !== email));
   };
 
   const handleNext = () => {
@@ -74,25 +102,29 @@ export function NewProjectWizard() {
     }
   };
 
-  const handleProjectDetailsChange = (field: keyof ProjectDetails) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setProjectDetails(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }));
-  };
+  const handleProjectDetailsChange =
+    (field: keyof ProjectDetails) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setProjectDetails((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
+    };
 
   const renderProjectDetailsForm = () => (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Create New Project</h2>
-        <p className="text-muted-foreground">Fill in the details to get started with your new project.</p>
+        <p className="text-muted-foreground">
+          Fill in the details to get started with your new project.
+        </p>
       </div>
       <div className="space-y-6">
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="projectName" className="text-sm font-medium">Project Name*</Label>
+            <Label htmlFor="projectName" className="text-sm font-medium">
+              Project Name*
+            </Label>
             <Input
               id="projectName"
               value={projectDetails.name}
@@ -102,7 +134,9 @@ export function NewProjectWizard() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="shortDescription" className="text-sm font-medium">Short Description</Label>
+            <Label htmlFor="shortDescription" className="text-sm font-medium">
+              Short Description
+            </Label>
             <Input
               id="shortDescription"
               value={projectDetails.shortDescription}
@@ -112,7 +146,9 @@ export function NewProjectWizard() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="fullDescription" className="text-sm font-medium">Full Description</Label>
+            <Label htmlFor="fullDescription" className="text-sm font-medium">
+              Full Description
+            </Label>
             <Textarea
               id="fullDescription"
               value={projectDetails.fullDescription}
@@ -148,10 +184,12 @@ export function NewProjectWizard() {
         </Button>
         <div>
           <h2 className="text-2xl font-semibold">Choose Data Source</h2>
-          <p className="text-muted-foreground mt-1">Select the type of data source you want to connect to.</p>
+          <p className="text-muted-foreground mt-1">
+            Select the type of data source you want to connect to.
+          </p>
         </div>
       </div>
-      
+
       <Tabs defaultValue="databases" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="databases">Databases</TabsTrigger>
@@ -233,11 +271,7 @@ export function NewProjectWizard() {
         </TabsContent>
       </Tabs>
       <div className="flex justify-end pt-4">
-        <Button
-          onClick={handleNext}
-          disabled={!selectedSource}
-          size="lg"
-        >
+        <Button onClick={handleNext} disabled={!selectedSource} size="lg">
           Next
         </Button>
       </div>
@@ -259,7 +293,9 @@ export function NewProjectWizard() {
             </Button>
             <div>
               <h2 className="text-2xl font-semibold">Database Connection</h2>
-              <p className="text-muted-foreground mt-1">Enter your database connection details.</p>
+              <p className="text-muted-foreground mt-1">
+                Enter your database connection details.
+              </p>
             </div>
           </div>
           <div className="grid gap-6 max-w-2xl">
@@ -289,15 +325,11 @@ export function NewProjectWizard() {
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={handleTestConnection}
-            >
+            <Button variant="outline" size="lg" onClick={handleTestConnection}>
               {isConnectionTested ? "Connection Successful" : "Test Connection"}
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={() => setStep(4)}
               disabled={!isConnectionTested}
             >
@@ -351,7 +383,10 @@ export function NewProjectWizard() {
               </svg>
             </div>
             <div className="text-sm">
-              <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+              <span className="font-semibold text-primary">
+                Click to upload
+              </span>{" "}
+              or drag and drop
               <div className="text-xs text-muted-foreground mt-1">
                 {selectedSource === "csv" ? "CSV" : "JSON"} files only
               </div>
@@ -375,7 +410,9 @@ export function NewProjectWizard() {
         </Button>
         <div>
           <h2 className="text-2xl font-semibold">Invite Team Members</h2>
-          <p className="text-muted-foreground mt-1">Add team members to your project.</p>
+          <p className="text-muted-foreground mt-1">
+            Add team members to your project.
+          </p>
         </div>
       </div>
 
@@ -452,13 +489,15 @@ export function NewProjectWizard() {
       </div>
 
       <div className="flex justify-end pt-4">
-        <Button 
+        <Button
           size="lg"
           onClick={() => {
             // Handle project creation
             const dialog = document.querySelector('[role="dialog"]');
             if (dialog) {
-              const closeButton = dialog.querySelector('[data-radix-collection-item]');
+              const closeButton = dialog.querySelector(
+                "[data-radix-collection-item]"
+              );
               if (closeButton instanceof HTMLElement) {
                 closeButton.click();
               }
@@ -472,7 +511,7 @@ export function NewProjectWizard() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl h-full w-full mx-auto p-6">
       {step === 1 && renderProjectDetailsForm()}
       {step === 2 && renderDataSourceSelection()}
       {step === 3 && renderDataSourceForm()}
