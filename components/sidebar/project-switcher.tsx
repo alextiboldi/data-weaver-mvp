@@ -4,6 +4,7 @@
 import * as React from "react";
 import { ChevronsUpDown, Plus, Database } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,7 @@ export function ProjectSwitcher({
   initialProjects: Project[];
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
   const [projects, setProjects] = React.useState(initialProjects);
   const [activeProject, setActiveProject] = React.useState(projects[0] || null);
 
@@ -71,7 +73,10 @@ export function ProjectSwitcher({
             {projects.map((project, index) => (
               <DropdownMenuItem
                 key={project.id}
-                onClick={() => setActiveProject(project)}
+                onClick={() => {
+                  setActiveProject(project);
+                  router.push(`/dashboard/${project.id}`);
+                }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
