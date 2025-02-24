@@ -1,11 +1,20 @@
 export type Project = {
   id: string;
   name: string;
+  shortDescription?: string;
+  description?: string;
   dataSource: string;
   connectionConfig: any;
   selectedTables: string[];
   tables: Array<Table>;
   queries: Array<Query>;
+};
+
+export type TableRelation = {
+  sourceColumn: string;
+  targetTable: string;
+  targetColumn: string;
+  relationType: 'PRIMARY KEY' | 'FOREIGN KEY' | 'NONE';
 };
 export type Query = {
   id: string;

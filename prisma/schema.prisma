@@ -91,14 +91,17 @@ model TableInfo {
 }
 
 model ColumnInfo {
-  id        String    @id @default(cuid())
-  table     TableInfo @relation(fields: [tableId], references: [id])
-  tableId   String
-  name      String
-  comment   String?
-  type      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  table         TableInfo @relation(fields: [tableId], references: [id])
+  tableId       String
+  name          String
+  comment       String?
+  type          String
+  columnSize    String?
+  isPrimaryKey  Boolean   @default(false)
+  isForeignKey  Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@unique([tableId, name])
 }

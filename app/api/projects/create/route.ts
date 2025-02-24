@@ -81,13 +81,59 @@ ORDER BY c.table_name, c.ordinal_position;
       data.connection.schema || "public",
     ]);
 
+    // Group results by table
+    const tables = result.rows.reduce((acc, row) => {
+      if (!acc[row.table_name]) {
+        acc[row.table_name] = {
+          tableName: row.table_name,
+          comment: row.table_comment,
+          columns: [],
+        };
+      }
+      
+      acc[row.table_name].columns.push({
+        name: row.column_name,
+        type: row.data_type,
+        columnSize: row.column_size,
+        comment: row.column_comment,
+        isPrimaryKey: row.is_primary_key,
+        isForeignKey: row.is_foreign_key,
+      });
+      
+      return acc;
+    }, {});
+
     const project = await prisma.project.create({
       data: {
-        ownerId: "cm7dk3t5r0000cy6vou7nf4b3",
+        ownerId: "cm7dk3t5r0000cy6vou7nf4b3", // You should get this from the session
         name: data.name,
-
+        shortDescription: data.shortDescription,
+        description: data.description,
         dataSource: data.dataSource,
         connectionConfig: data.connection,
+        tables: {
+          create: Object.values(tables).map((table: any) => ({
+            tableName: table.tableName,
+            comment: table.comment,
+            columns: {
+              create: table.columns.map((column: any) => ({
+                name: column.name,
+                type: column.type,
+                columnSize: column.columnSize,
+                comment: column.comment,
+                isPrimaryKey: column.isPrimaryKey,
+                isForeignKey: column.isForeignKey,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        tables: {
+          include: {
+            columns: true,
+          },
+        },
       },
     });
 

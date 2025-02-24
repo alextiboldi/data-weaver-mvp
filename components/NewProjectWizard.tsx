@@ -516,16 +516,46 @@ export function NewProjectWizard() {
       <div className="flex justify-end pt-4">
         <Button
           size="lg"
-          onClick={() => {
-            // Handle project creation
-            const dialog = document.querySelector('[role="dialog"]');
-            if (dialog) {
-              const closeButton = dialog.querySelector(
-                "[data-radix-collection-item]"
-              );
-              if (closeButton instanceof HTMLElement) {
-                closeButton.click();
+          onClick={async () => {
+            try {
+              const response = await fetch('/api/projects/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: projectDetails.name,
+                  shortDescription: projectDetails.shortDescription,
+                  description: projectDetails.fullDescription,
+                  dataSource: selectedSource,
+                  connection: {
+                    host: (document.getElementById('server') as HTMLInputElement).value,
+                    port: (document.getElementById('port') as HTMLInputElement).value,
+                    user: (document.getElementById('user') as HTMLInputElement).value,
+                    password: (document.getElementById('password') as HTMLInputElement).value,
+                    database: (document.getElementById('database') as HTMLInputElement).value,
+                    schema: (document.getElementById('schema') as HTMLInputElement).value || 'public',
+                  },
+                  teamMembers,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to create project');
               }
+
+              const dialog = document.querySelector('[role="dialog"]');
+              if (dialog) {
+                const closeButton = dialog.querySelector(
+                  "[data-radix-collection-item]"
+                );
+                if (closeButton instanceof HTMLElement) {
+                  closeButton.click();
+                }
+              }
+            } catch (error) {
+              console.error('Error creating project:', error);
+              // You might want to show an error message to the user here
             }
           }}
         >
