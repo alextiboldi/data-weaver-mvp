@@ -7,6 +7,25 @@ import { TableDataViewer } from "@/components/pages/project/TableDataViewer";
 import useStore from "@/store/app-store";
 import { Table } from "@/lib/types";
 
+const createNodeTypes = (handleTableClick: (table: Table) => void) => ({
+  databaseSchema: (props: any) => (
+    <div onContextMenu={(e) => e.preventDefault()}>
+      <TableContextMenu 
+        onViewData={() => handleTableClick({
+          id: props.id,
+          name: props.data.label,
+          columns: props.data.schema.map((s: any) => ({
+            name: s.title,
+            type: s.type
+          }))
+        })}
+      >
+        {props.children}
+      </TableContextMenu>
+    </div>
+  ),
+});
+
 export default function DataPage({
   params,
 }: {
@@ -38,22 +57,7 @@ export default function DataPage({
       <div className="flex-1 min-h-0">
         <SchemaViewer
           project={selectedProject}
-          nodeTypes={{
-            databaseSchema: (props: any) => (
-              <TableContextMenu 
-                onViewData={() => handleTableClick({
-                  id: props.id,
-                  name: props.data.label,
-                  columns: props.data.schema.map((s: any) => ({
-                    name: s.title,
-                    type: s.type
-                  }))
-                })}
-              >
-                {props.children}
-              </TableContextMenu>
-            ),
-          }}
+          nodeTypes={createNodeTypes(handleTableClick)}
         />
       </div>
       <div className="h-1/3 min-h-[300px] border-t">
