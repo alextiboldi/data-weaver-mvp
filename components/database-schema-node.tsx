@@ -13,11 +13,15 @@ type DatabaseSchemaNode = Node<{
 export function DatabaseSchemaNode({
   data,
   selected,
-}: NodeProps<DatabaseSchemaNode>) {
+  searchResults,
+}: NodeProps<DatabaseSchemaNode> & { searchResults?: any[] }) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
+  const matchedColumns = searchResults?.find(result => result.tableName === data.label)?.matches || [];
+  const isTableMatched = matchedColumns.length > 0;
 
   return (
     <BaseNode className="p-0" selected={selected} onContextMenu={handleContextMenu}>

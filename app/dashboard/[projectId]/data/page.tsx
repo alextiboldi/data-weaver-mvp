@@ -71,6 +71,7 @@ export default function DataPage({
       <div className="flex-1 min-h-0">
         <SchemaViewer
           project={selectedProject}
+          searchResults={searchResults}
           nodeTypes={{
             databaseSchema: (props: any) => (
               <TableContextMenu
