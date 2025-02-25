@@ -59,7 +59,7 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
-export default function SchemaViewer({ project }: { project: Project }) {
+export default function SchemaViewer({ project, searchResults }: { project: Project, searchResults?: any[] }) {
   const { nodes, edges } = createNodesAndEdges(project);
 
   return (
@@ -67,7 +67,11 @@ export default function SchemaViewer({ project }: { project: Project }) {
       <ReactFlow
         defaultNodes={nodes}
         defaultEdges={edges}
-        nodeTypes={nodeTypes}
+        nodeTypes={{
+          databaseSchema: (props: any) => (
+            <DatabaseSchemaNode {...props} searchResults={searchResults} />
+          ),
+        }}
         fitView
       >
         <Background />
