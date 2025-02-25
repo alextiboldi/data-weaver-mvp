@@ -1,36 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Background, Edge, ReactFlow } from "@xyflow/react";
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import "@xyflow/react/dist/style.css";
 import { Project } from "@/lib/types";
-
-const nodeTypes = {
-  databaseSchema: DatabaseSchemaNode,
-} as const;
-
-// type ProjectWithRelations = Project & {
-//   tables: Array<{
-//     id: string;
-//     tableName: string;
-//     columns: Array<{
-//       id: string;
-//       name: string;
-//       type: string;
-//       isPrimaryKey: boolean;
-//     }>;
-//     relationships: Array<{
-//       id: string;
-//       sourceColumn: string;
-//       targetTable: {
-//         id: string;
-//         tableName: string;
-//       };
-//       targetColumn: string;
-//     }>;
-//   }>;
-// };
 
 function createNodesAndEdges(project: Project) {
   const nodes = project.tables.map((table, index) => ({
@@ -60,18 +34,20 @@ function createNodesAndEdges(project: Project) {
 }
 
 export default function SchemaViewer({ project, searchResults }: { project: Project, searchResults?: any[] }) {
-  const { nodes, edges } = createNodesAndEdges(project);
+  const { nodes, edges } = useMemo(() => createNodesAndEdges(project), [project]);
+
+  const nodeTypes = useMemo(() => ({
+    databaseSchema: (props: any) => (
+      <DatabaseSchemaNode {...props} searchResults={searchResults} />
+    ),
+  }), [searchResults]);
 
   return (
     <div className="h-full w-full">
       <ReactFlow
         defaultNodes={nodes}
         defaultEdges={edges}
-        nodeTypes={{
-          databaseSchema: (props: any) => (
-            <DatabaseSchemaNode {...props} searchResults={searchResults} />
-          ),
-        }}
+        nodeTypes={nodeTypes}
         fitView
       >
         <Background />
