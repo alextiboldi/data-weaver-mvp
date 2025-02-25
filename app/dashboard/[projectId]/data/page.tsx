@@ -80,9 +80,15 @@ export default function DataPage({
                     id: props.id,
                     name: props.data.label,
                     columns: props.data.schema.map((s: any) => ({
+                      id: `${props.id}-${s.title}`,
                       name: s.title,
                       type: s.type,
+                      isPrimaryKey: false,
+                      comment: ''
                     })),
+                    relationships: [],
+                    reverseRels: [],
+                    comment: ''
                   })
                 }
               >
