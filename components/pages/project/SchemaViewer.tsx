@@ -38,7 +38,28 @@ export default function SchemaViewer({ project, searchResults }: { project: Proj
 
   const nodeTypes = useMemo(() => ({
     databaseSchema: (props: any) => (
-      <DatabaseSchemaNode {...props} searchResults={searchResults} />
+      <TableContextMenu
+        onViewData={() => {
+          // Handle table click
+          const table = {
+            id: props.id,
+            name: props.data.label,
+            columns: props.data.schema.map((s: any) => ({
+              id: `${props.id}-${s.title}`,
+              name: s.title,
+              type: s.type,
+              isPrimaryKey: false,
+              comment: ''
+            })),
+            relationships: [],
+            reverseRels: [],
+            comment: ''
+          };
+          // Add your table click handler here if needed
+        }}
+      >
+        <DatabaseSchemaNode {...props} searchResults={searchResults} />
+      </TableContextMenu>
     ),
   }), [searchResults]);
 

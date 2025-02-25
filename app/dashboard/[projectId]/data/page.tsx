@@ -72,30 +72,6 @@ export default function DataPage({
         <SchemaViewer
           project={selectedProject}
           searchResults={searchResults}
-          nodeTypes={{
-            databaseSchema: (props: any) => (
-              <TableContextMenu
-                onViewData={() =>
-                  handleTableClick({
-                    id: props.id,
-                    name: props.data.label,
-                    columns: props.data.schema.map((s: any) => ({
-                      id: `${props.id}-${s.title}`,
-                      name: s.title,
-                      type: s.type,
-                      isPrimaryKey: false,
-                      comment: ''
-                    })),
-                    relationships: [],
-                    reverseRels: [],
-                    comment: ''
-                  })
-                }
-              >
-                {props.children}
-              </TableContextMenu>
-            ),
-          }}
         />
       </div>
       <div className="h-1/3 min-h-[300px] border-t">
