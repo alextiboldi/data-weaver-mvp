@@ -27,12 +27,12 @@ export default function Header() {
             >
               Features
             </Link>
-            <Link
+            {/* <Link
               href="#testimonials"
               className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Testimonials
-            </Link>
+            </Link> */}
             <Link
               href="#pricing"
               className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"

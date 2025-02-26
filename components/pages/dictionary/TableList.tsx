@@ -1,6 +1,7 @@
-
+import { Button } from "@/components/ui/button";
 import { Table } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Table2 } from "lucide-react";
 
 interface TableListProps {
   tables: Table[];
@@ -8,21 +9,27 @@ interface TableListProps {
   selectedTableId?: string;
 }
 
-export function TableList({ tables, onSelectTable, selectedTableId }: TableListProps) {
+export function TableList({
+  tables,
+  onSelectTable,
+  selectedTableId,
+}: TableListProps) {
   return (
-    <div className="space-y-1">
+    <nav className="space-y-1">
       {tables.map((table) => (
-        <button
+        <Button
           key={table.id}
           onClick={() => onSelectTable(table)}
+          variant={selectedTableId === table.id ? "secondary" : "ghost"}
           className={cn(
-            "w-full text-left px-4 py-2 rounded-md hover:bg-accent transition-colors",
-            selectedTableId === table.id && "bg-accent"
+            "w-full justify-start text-sm",
+            selectedTableId === table.id && "bg-muted font-medium"
           )}
         >
+          <Table2 className="mr-2 h-4 w-4" />
           {table.name}
-        </button>
+        </Button>
       ))}
-    </div>
+    </nav>
   );
 }

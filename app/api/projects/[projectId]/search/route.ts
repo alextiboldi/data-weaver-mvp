@@ -35,59 +35,64 @@ export async function GET(
     // Connect to the database
     const pool = new Pool(project.connectionConfig);
 
-    const results = await Promise.all(
-      project.tables.map(async (table) => {
-        // Filter string-type columns
-        const stringColumns = table.columns.filter((col) =>
-          ["character varying", "varchar", "text", "char", "string"].includes(
-            col.type.toLowerCase()
-          )
-        );
+    const schema = "onesource";
 
-        if (stringColumns.length === 0) return null;
+    //remove all tables from project that don't have the table.name book_contents
+    // project.tables = project.tables.filter(
+    //   (table) => table.name === "book_contents"
+    // );
 
-        // Build WHERE clause
-        const whereClause = stringColumns
-          .map(
-            (col) =>
-              `${project.connectionConfig.schema}.${table.name}.${col.name}::text ILIKE $1`
-          )
-          .join(" OR ");
+    const searchPromises = project.tables.map(async (table) => {
+      // Filter string-type columns
+      const stringColumns = table.columns.filter((col) =>
+        ["character varying", "varchar", "text", "char", "string"].includes(
+          col.type.toLowerCase()
+        )
+      );
 
-        const query = `
-        SELECT COUNT(*) as match_count 
-        FROM ${project.connectionConfig.schema}.${table.name}
-        WHERE ${whereClause}
-      `;
+      if (stringColumns.length === 0) return null;
 
-        console.log(query);
+      // Use map() to return an array of promises for each column search
+      const columnPromises = stringColumns.map(async (column) => {
+        const searchQuery = `
+            SELECT '${table.name}' AS table_name, '${column.name}' AS column_name
+            FROM ${schema}.${table.name}
+            WHERE CAST(${schema}.${table.name}.${column.name} AS TEXT) = $1
+            LIMIT 1;
+          `;
 
         try {
-          const result = await pool.query(query, [`%${searchTerm}%`]);
-          const matchCount = parseInt(result.rows[0].match_count);
+          const res = await pool.query(searchQuery, [searchTerm]);
 
-          if (matchCount > 0) {
-            return {
-              tableName: table.name,
-              matches: stringColumns.map((col) => ({
-                column_name: col.name,
-                match_count: matchCount,
-              })),
-            };
+          if (res.rows.length > 0) {
+            console.log(
+              `Found in table: ${table.name}, column: ${column.name}`
+            );
+            return res.rows; // Returns the result properly
           }
         } catch (error) {
-          console.error(`Error searching table ${table.name}:`, error);
+          console.error(
+            `Error searching table ${table.name}, column ${column.name}:`,
+            error
+          );
         }
 
-        return null;
-      })
-    );
+        return null; // Return null if no match
+      });
+
+      // Resolve all column search promises
+      const columnResults = await Promise.all(columnPromises);
+      return columnResults.filter(Boolean); // Filter out null results
+    });
+
+    // Resolve all table search promises
+    const results = (await Promise.all(searchPromises)).flat(Infinity); // Flatten nested arrays
 
     await pool.end();
-
-    return NextResponse.json({
-      results: results.filter(Boolean),
-    });
+    console.log("Results: ", results);
+    return NextResponse.json(results);
+    // const results = [{ table_name: "book_contents", column_name: "page_name" }];
+    // return NextResponse.json(results);
   } catch (error) {
     console.error("Error during search:", error);
     return NextResponse.json(

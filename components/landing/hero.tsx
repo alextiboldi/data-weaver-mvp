@@ -19,7 +19,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              Simplify Your Workflow
+              Simplify Your Data Exploration
             </motion.span>
             <motion.span
               className="text-foreground"
@@ -27,7 +27,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              with StreamLine
+              with Data Weaver
             </motion.span>
           </h1>
           <motion.p
@@ -36,8 +36,10 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Boost productivity and streamline your business processes with our
-            powerful SaaS platform. Designed for teams of all sizes.
+            DataWeaver transforms your data into a visual map, revealing hidden
+            relationships between tables, columns, and values. Effortlessly
+            document your database, collaborate with your team, and generate
+            shareable insights—all in one powerful tool
           </motion.p>
           <motion.div
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"

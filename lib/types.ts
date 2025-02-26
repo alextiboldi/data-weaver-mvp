@@ -31,18 +31,22 @@ export type Query = {
 export type Table = {
   id: string;
   name: string;
+  synonym?: string;
   columns: Array<Column>;
   relationships: Array<Relationship>;
   reverseRels: Array<Relationship>;
-  comment: string;
+  comment?: string;
+  description?: string;
 };
 
 export type Column = {
   id: string;
   name: string;
+  synonym?: string;
   type: string;
   isPrimaryKey: boolean;
-  comment: string;
+  comment?: string;
+  description?: string;
 };
 
 export interface Relationship {

@@ -32,7 +32,8 @@ export default function DataPage({
         throw new Error("Search failed");
       }
       const data = await response.json();
-      setSearchResults(data.results);
+      console.log("server data", data);
+      setSearchResults(data);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -69,10 +70,7 @@ export default function DataPage({
         )}
       </div>
       <div className="flex-1 min-h-0">
-        <SchemaViewer
-          project={selectedProject}
-          searchResults={searchResults}
-        />
+        <SchemaViewer project={selectedProject} searchResults={searchResults} />
       </div>
       <div className="h-1/3 min-h-[300px] border-t">
         <TableDataViewer table={selectedTable} data={tableData} />

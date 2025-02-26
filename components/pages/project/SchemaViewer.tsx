@@ -5,6 +5,7 @@ import { Background, Edge, ReactFlow } from "@xyflow/react";
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import "@xyflow/react/dist/style.css";
 import { Project } from "@/lib/types";
+import { TableContextMenu } from "./TableContextMenu";
 
 function createNodesAndEdges(project: Project) {
   const nodes = project.tables.map((table, index) => ({
@@ -33,42 +34,54 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
-export default function SchemaViewer({ project, searchResults }: { project: Project, searchResults?: any[] }) {
-  const { nodes, edges } = useMemo(() => createNodesAndEdges(project), [project]);
+// Define nodeTypes outside to ensure it's not recreated on every render
+const getNodeTypes = (searchResults?: any[]) => ({
+  databaseSchema: (props: any) => (
+    <TableContextMenu
+      onViewData={() => {
+        // Handle table click
+        const table = {
+          id: props.id,
+          name: props.data.label,
+          columns: props.data.schema.map((s: any) => ({
+            id: `${props.id}-${s.title}`,
+            name: s.title,
+            type: s.type,
+            isPrimaryKey: false,
+            comment: "",
+          })),
+          relationships: [],
+          reverseRels: [],
+          comment: "",
+        };
+        // Add your table click handler here if needed
+      }}
+    >
+      <DatabaseSchemaNode {...props} searchResults={searchResults} />
+    </TableContextMenu>
+  ),
+});
 
-  const nodeTypes = useMemo(() => ({
-    databaseSchema: (props: any) => (
-      <TableContextMenu
-        onViewData={() => {
-          // Handle table click
-          const table = {
-            id: props.id,
-            name: props.data.label,
-            columns: props.data.schema.map((s: any) => ({
-              id: `${props.id}-${s.title}`,
-              name: s.title,
-              type: s.type,
-              isPrimaryKey: false,
-              comment: ''
-            })),
-            relationships: [],
-            reverseRels: [],
-            comment: ''
-          };
-          // Add your table click handler here if needed
-        }}
-      >
-        <DatabaseSchemaNode {...props} searchResults={searchResults} />
-      </TableContextMenu>
-    ),
-  }), [searchResults]);
+export default function SchemaViewer({
+  project,
+  searchResults,
+}: {
+  project: Project;
+  searchResults?: any[];
+}) {
+  const { nodes, edges } = useMemo(
+    () => createNodesAndEdges(project),
+    [project]
+  );
+
+  console.log("Search Results: ", searchResults);
 
   return (
     <div className="h-full w-full">
       <ReactFlow
         defaultNodes={nodes}
         defaultEdges={edges}
-        nodeTypes={nodeTypes}
+        nodeTypes={useMemo(() => getNodeTypes(searchResults), [searchResults])} // Memoizing function call
         fitView
       >
         <Background />
