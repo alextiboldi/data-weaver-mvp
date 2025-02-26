@@ -82,6 +82,8 @@ model TableInfo {
   projectId   String
   name   String
   comment     String?
+  synonym     String?
+  description String?
   columns     ColumnInfo[]
   relationships   Relationship[] @relation("SourceTable")
   reverseRels Relationship[] @relation("TargetTable")
@@ -97,6 +99,8 @@ model ColumnInfo {
   tableId       String
   name          String
   comment       String?
+  synonym       String?
+  description   String?
   type          String
   columnSize    String?
   isPrimaryKey  Boolean   @default(false)
