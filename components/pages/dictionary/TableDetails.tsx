@@ -6,14 +6,34 @@ interface TableDetailsProps {
 }
 
 export function TableDetails({ table }: TableDetailsProps) {
+  const [isSaving, setIsSaving] = useState(false);
   const [tableSynonym, setTableSynonym] = useState(table.synonym || '');
   const [tableDescription, setTableDescription] = useState(table.description || '');
+  const [hasChanges, setHasChanges] = useState(false);
   const [columnMetadata, setColumnMetadata] = useState(
     table.columns.reduce((acc, col) => ({
       ...acc,
       [col.id]: { synonym: col.synonym || '', description: col.description || '' }
     }), {})
   );
+
+  const handleChange = () => {
+    setHasChanges(true);
+  };
+
+  const saveAllChanges = async () => {
+    setIsSaving(true);
+    try {
+      await updateTableMetadata();
+      for (const columnId of Object.keys(columnMetadata)) {
+        await updateColumnMetadata(columnId);
+      }
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+    }
+    setIsSaving(false);
+  };
 
   const updateTableMetadata = async () => {
     try {
@@ -46,7 +66,20 @@ export function TableDetails({ table }: TableDetailsProps) {
     }
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      <div className="absolute top-0 right-0">
+        <button
+          onClick={saveAllChanges}
+          disabled={!hasChanges || isSaving}
+          className={`px-4 py-2 rounded-md text-white transition-colors ${
+            hasChanges 
+              ? 'bg-blue-500 hover:bg-blue-600' 
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
+        >
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
       <div className="rounded-md border">
         <table className="w-full">
           <thead className="bg-muted">
@@ -65,8 +98,10 @@ export function TableDetails({ table }: TableDetailsProps) {
                   className="w-full bg-background border rounded-md px-2 py-1"
                   placeholder="Enter synonym"
                   value={tableSynonym}
-                  onChange={(e) => setTableSynonym(e.target.value)}
-                  onBlur={updateTableMetadata}
+                  onChange={(e) => {
+                    setTableSynonym(e.target.value);
+                    handleChange();
+                  }}
                 />
               </td>
               <td className="p-3 border-t">
@@ -75,8 +110,10 @@ export function TableDetails({ table }: TableDetailsProps) {
                   rows={2}
                   placeholder="Enter description"
                   value={tableDescription}
-                  onChange={(e) => setTableDescription(e.target.value)}
-                  onBlur={updateTableMetadata}
+                  onChange={(e) => {
+                    setTableDescription(e.target.value);
+                    handleChange();
+                  }}
                 />
               </td>
             </tr>
