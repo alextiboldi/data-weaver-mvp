@@ -1,11 +1,16 @@
+
 "use client";
 import { useState } from "react";
 import SchemaViewer from "@/components/pages/project/SchemaViewer";
 import { TableContextMenu } from "@/components/pages/project/TableContextMenu";
 import { TableDataViewer } from "@/components/pages/project/TableDataViewer";
+import { TableDetailViewer } from "@/components/pages/project/TableDetailViewer";
 import useStore from "@/store/app-store";
 import { Table } from "@/lib/types";
 import { SearchBar } from "@/components/search-bar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronUp } from "lucide-react";
 
 export default function DataPage({
   params,
@@ -17,6 +22,7 @@ export default function DataPage({
   const [tableData, setTableData] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) return;
@@ -32,7 +38,6 @@ export default function DataPage({
         throw new Error("Search failed");
       }
       const data = await response.json();
-      console.log("server data", data);
       setSearchResults(data);
     } catch (error) {
       console.error("Search error:", error);
@@ -40,6 +45,7 @@ export default function DataPage({
       setIsSearching(false);
     }
   };
+
   const handleTableClick = async (table: Table) => {
     setSelectedTable(table);
     try {
@@ -72,9 +78,31 @@ export default function DataPage({
       <div className="flex-1 min-h-0">
         <SchemaViewer project={selectedProject} searchResults={searchResults} />
       </div>
-      <div className="h-1/3 min-h-[300px] border-t">
-        <TableDataViewer table={selectedTable} data={tableData} />
-      </div>
+      <Collapsible
+        open={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        className="border-t bg-background"
+      >
+        <CollapsibleTrigger className="flex items-center justify-center w-full p-2 hover:bg-muted/50">
+          <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${isDrawerOpen ? '' : 'rotate-180'}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="h-[300px] overflow-auto">
+          <Tabs defaultValue="details" className="w-full h-full">
+            <TabsList className="px-4 pt-2">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="data">Data</TabsTrigger>
+            </TabsList>
+            <div className="p-4">
+              <TabsContent value="details">
+                <TableDetailViewer table={selectedTable} />
+              </TabsContent>
+              <TabsContent value="data">
+                <TableDataViewer table={selectedTable} data={tableData} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }
