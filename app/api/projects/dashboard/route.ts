@@ -33,7 +33,7 @@ export async function GET() {
         queries: true,
       },
     });
-
+    console.log(JSON.stringify(dbSelectedProject, null, 2));
     return NextResponse.json({ dbProjectInfo, dbSelectedProject });
   } catch (error) {
     return NextResponse.json(

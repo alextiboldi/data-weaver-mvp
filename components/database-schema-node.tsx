@@ -4,6 +4,8 @@ import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { BaseNode } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
+import { useEffect } from "react";
+import useStore from "@/store/app-store";
 
 type DatabaseSchemaNode = Node<{
   label: string;
@@ -15,10 +17,11 @@ export function DatabaseSchemaNode({
   selected,
   searchResults,
 }: NodeProps<DatabaseSchemaNode> & { searchResults?: any[] }) {
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  const { setSelectedTable } = useStore();
+
+  useEffect(() => {
+    if (selected) setSelectedTable(data.label);
+  }, [selected]);
 
   //find a value form the search array in the data.schema array
   let columnsToHighlight: string[] = [];
@@ -40,7 +43,6 @@ export function DatabaseSchemaNode({
     <BaseNode
       className={`p-0 (${isTableMatched ? "border-2 border-red-500" : ""})`}
       selected={isTableMatched || selected}
-      onContextMenu={handleContextMenu}
     >
       <h2 className="rounded-tl-md rounded-tr-md bg-secondary p-2 text-center text-sm text-muted-foreground">
         {data.label}

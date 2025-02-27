@@ -1,6 +1,5 @@
-
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SchemaViewer from "@/components/pages/project/SchemaViewer";
 import { TableContextMenu } from "@/components/pages/project/TableContextMenu";
 import { TableDataViewer } from "@/components/pages/project/TableDataViewer";
@@ -9,20 +8,37 @@ import useStore from "@/store/app-store";
 import { Table } from "@/lib/types";
 import { SearchBar } from "@/components/search-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { ChevronUp } from "lucide-react";
+import { TableDetails } from "@/components/pages/dictionary/TableDetails";
 
 export default function DataPage({
   params,
 }: {
   params: { projectId: string };
 }) {
-  const { selectedProject } = useStore();
-  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
+  const { selectedProject, selectedTable } = useStore();
+  const [selectedTableForView, setSelectedTableForView] =
+    useState<Table | null>(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+
+  useEffect(() => {
+    console.log("Table selected: ", selectedTable);
+    //find the table in the selected project by name
+    const table = selectedProject?.tables.find(
+      (table) => table.name === selectedTable
+    );
+    if (table) {
+      setSelectedTableForView(table);
+    }
+  }, [selectedTable]);
 
   const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) return;
@@ -46,22 +62,22 @@ export default function DataPage({
     }
   };
 
-  const handleTableClick = async (table: Table) => {
-    setSelectedTable(table);
-    try {
-      const response = await fetch(
-        `/api/projects/${params.projectId}/tables/${table.name}/data`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch table data");
-      }
-      const { data } = await response.json();
-      setTableData(data);
-    } catch (error) {
-      console.error("Error fetching table data:", error);
-      setTableData([]);
-    }
-  };
+  // const handleTableClick = async (table: Table) => {
+  //   setSelectedTable(table);
+  //   try {
+  //     const response = await fetch(
+  //       `/api/projects/${params.projectId}/tables/${table.name}/data`
+  //     );
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch table data");
+  //     }
+  //     const { data } = await response.json();
+  //     setTableData(data);
+  //   } catch (error) {
+  //     console.error("Error fetching table data:", error);
+  //     setTableData([]);
+  //   }
+  // };
 
   if (!selectedProject) return <div>Loading...</div>;
 
@@ -84,7 +100,11 @@ export default function DataPage({
         className="border-t bg-background"
       >
         <CollapsibleTrigger className="flex items-center justify-center w-full p-2 hover:bg-muted/50">
-          <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${isDrawerOpen ? '' : 'rotate-180'}`} />
+          <ChevronUp
+            className={`h-4 w-4 transition-transform duration-200 ${
+              isDrawerOpen ? "" : "rotate-180"
+            }`}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent className="h-[300px] overflow-auto">
           <Tabs defaultValue="details" className="w-full h-full">
@@ -94,10 +114,16 @@ export default function DataPage({
             </TabsList>
             <div className="p-4">
               <TabsContent value="details">
-                <TableDetailViewer table={selectedTable} />
+                {selectedTableForView ? (
+                  <TableDetails table={selectedTableForView} />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground">
+                    Select a table to view details
+                  </div>
+                )}
               </TabsContent>
               <TabsContent value="data">
-                <TableDataViewer table={selectedTable} data={tableData} />
+                {/* <TableDataViewer table={selectedTable} data={tableData} /> */}
               </TabsContent>
             </div>
           </Tabs>

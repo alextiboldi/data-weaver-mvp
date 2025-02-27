@@ -34,31 +34,38 @@ function createNodesAndEdges(project: Project) {
   return { nodes, edges };
 }
 
+// // Define nodeTypes outside to ensure it's not recreated on every render
+// const getNodeTypes = (searchResults?: any[]) => ({
+//   databaseSchema: (props: any) => (
+//     <TableContextMenu
+//       onViewData={() => {
+//         // Handle table click
+//         const table = {
+//           id: props.id,
+//           name: props.data.label,
+//           columns: props.data.schema.map((s: any) => ({
+//             id: `${props.id}-${s.title}`,
+//             name: s.title,
+//             type: s.type,
+//             isPrimaryKey: false,
+//             comment: "",
+//           })),
+//           relationships: [],
+//           reverseRels: [],
+//           comment: "",
+//         };
+//         // Add your table click handler here if needed
+//       }}
+//     >
+//       <DatabaseSchemaNode {...props} searchResults={searchResults} />
+//     </TableContextMenu>
+//   ),
+// });
+
 // Define nodeTypes outside to ensure it's not recreated on every render
 const getNodeTypes = (searchResults?: any[]) => ({
   databaseSchema: (props: any) => (
-    <TableContextMenu
-      onViewData={() => {
-        // Handle table click
-        const table = {
-          id: props.id,
-          name: props.data.label,
-          columns: props.data.schema.map((s: any) => ({
-            id: `${props.id}-${s.title}`,
-            name: s.title,
-            type: s.type,
-            isPrimaryKey: false,
-            comment: "",
-          })),
-          relationships: [],
-          reverseRels: [],
-          comment: "",
-        };
-        // Add your table click handler here if needed
-      }}
-    >
-      <DatabaseSchemaNode {...props} searchResults={searchResults} />
-    </TableContextMenu>
+    <DatabaseSchemaNode {...props} searchResults={searchResults} />
   ),
 });
 
@@ -73,8 +80,6 @@ export default function SchemaViewer({
     () => createNodesAndEdges(project),
     [project]
   );
-
-  console.log("Search Results: ", searchResults);
 
   return (
     <div className="h-full w-full">

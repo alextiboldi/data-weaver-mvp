@@ -48,13 +48,26 @@ export function TableDetails({ table }: TableDetailsProps) {
     setHasChanges(true);
   };
 
+  const handleColumnChange = (
+    columnId: string,
+    field: string,
+    value: string
+  ) => {
+    setColumnMetadata((prev) => ({
+      ...prev,
+      [columnId]: {
+        ...prev[columnId],
+        [field]: value,
+      },
+    }));
+    handleChange();
+  };
+
   const saveAllChanges = async () => {
     setIsSaving(true);
     try {
       await updateTableMetadata();
-      for (const columnId of Object.keys(columnMetadata)) {
-        await updateColumnMetadata(columnId);
-      }
+      await updateAllColumnMetadata();
       setHasChanges(false);
     } catch (error) {
       console.error("Failed to save changes:", error);
@@ -78,20 +91,20 @@ export function TableDetails({ table }: TableDetailsProps) {
     }
   };
 
-  const updateColumnMetadata = async (columnId: string) => {
+  const updateAllColumnMetadata = async () => {
     try {
       await fetch("/api/dictionary/update-column", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          columnId,
-          ...columnMetadata[columnId],
+          columns: columnMetadata,
         }),
       });
     } catch (error) {
       console.error("Failed to update column metadata:", error);
     }
   };
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="container mx-auto py-6">
@@ -104,7 +117,9 @@ export function TableDetails({ table }: TableDetailsProps) {
               Manage table schema and properties
             </p>
           </div>
-          <Button>Save Changes</Button>
+          <Button disabled={!hasChanges} onClick={saveAllChanges}>
+            Save Changes
+          </Button>
         </div>
 
         <div className="grid gap-6">
@@ -188,14 +203,28 @@ export function TableDetails({ table }: TableDetailsProps) {
                         <Input
                           placeholder="Enter synonym"
                           className="h-8"
-                          defaultValue={column.synonym}
+                          value={columnMetadata[column.id].synonym}
+                          onChange={(e) =>
+                            handleColumnChange(
+                              column.id,
+                              "synonym",
+                              e.target.value
+                            )
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           placeholder="Enter description"
                           className="h-8"
-                          defaultValue={column.description}
+                          value={columnMetadata[column.id].description}
+                          onChange={(e) =>
+                            handleColumnChange(
+                              column.id,
+                              "description",
+                              e.target.value
+                            )
+                          }
                         />
                       </TableCell>
                     </TableRow>

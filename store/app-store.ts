@@ -8,6 +8,9 @@ type Store = {
   setAvailableProjects: (projects: ProjectInfo[]) => void;
   selectedProject?: Project;
   setSelectedProject: (project: Project) => void;
+
+  selectedTable?: string;
+  setSelectedTable: (table: string) => void;
 };
 
 const useStore = create<Store>()(
@@ -20,6 +23,10 @@ const useStore = create<Store>()(
       selectedProject: undefined,
       setSelectedProject: (project) => {
         set({ selectedProject: project });
+      },
+      selectedTable: "",
+      setSelectedTable: (table) => {
+        set({ selectedTable: table });
       },
     }),
     {
