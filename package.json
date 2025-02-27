@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@prisma/client": "^6.4.1",
     "@radix-ui/react-avatar": "^1.1.3",
     "@radix-ui/react-collapsible": "^1.1.3",
@@ -20,6 +22,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@uiw/react-codemirror": "^4.23.8",
     "@xyflow/react": "^12.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
