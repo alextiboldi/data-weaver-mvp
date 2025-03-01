@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,7 +45,7 @@ export default function QueryPage({
 
   const fetchSavedQueries = async () => {
     try {
-      const response = await fetch(`/api/queries/${params.projectId}`);
+      const response = await fetch(`/api/projects/${params.projectId}/queries`);
       if (response.ok) {
         const data = await response.json();
         setSavedQueries(data);
@@ -92,18 +91,21 @@ export default function QueryPage({
     if (!currentQuery.trim() || !newQueryTitle.trim()) return;
 
     try {
-      const response = await fetch(`/api/queries/save`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          projectId: params.projectId,
-          name: newQueryTitle,
-          description: newQueryDescription,
-          query: currentQuery,
-        }),
-      });
+      const response = await fetch(
+        `/api/projects/${params.projectId}/queries/save`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            projectId: params.projectId,
+            name: newQueryTitle,
+            description: newQueryDescription,
+            query: currentQuery,
+          }),
+        }
+      );
 
       if (response.ok) {
         // Refresh the list of saved queries
@@ -125,9 +127,9 @@ export default function QueryPage({
   return (
     <div className="flex h-full">
       {/* Saved Queries Panel */}
-      <SavedQueriesList 
-        queries={savedQueries} 
-        onSelectQuery={handleSelectQuery} 
+      <SavedQueriesList
+        queries={savedQueries}
+        onSelectQuery={handleSelectQuery}
       />
 
       {/* Main Content */}
@@ -170,15 +172,24 @@ export default function QueryPage({
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
                     Cancel
                   </Button>
                   <Button onClick={handleSaveQuery}>Save</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <Button onClick={handleRunQuery} disabled={isLoading} className="gap-2">
-              {isLoading ? "Running..." : (
+            <Button
+              onClick={handleRunQuery}
+              disabled={isLoading}
+              className="gap-2"
+            >
+              {isLoading ? (
+                "Running..."
+              ) : (
                 <>
                   <Play className="h-4 w-4" />
                   Run Query
@@ -189,16 +200,13 @@ export default function QueryPage({
         </div>
 
         {/* Query Editor */}
-        <SqlQueryEditor 
-          value={currentQuery} 
-          onChange={setCurrentQuery} 
-        />
+        <SqlQueryEditor value={currentQuery} onChange={setCurrentQuery} />
 
         {/* Results Section */}
         <div className="mt-6">
           <h2 className="text-lg font-semibold mb-2">Results</h2>
           <Separator className="mb-4" />
-          
+
           {queryResults === null ? (
             <div className="text-center py-12 text-muted-foreground">
               Run a query to see results
@@ -217,7 +225,9 @@ export default function QueryPage({
                 <thead>
                   <tr className="bg-muted">
                     {Object.keys(queryResults[0]).map((key) => (
-                      <th key={key} className="px-4 py-2 text-left font-medium">{key}</th>
+                      <th key={key} className="px-4 py-2 text-left font-medium">
+                        {key}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -226,7 +236,7 @@ export default function QueryPage({
                     <tr key={rowIndex} className="border-t">
                       {Object.values(row).map((value: any, valueIndex) => (
                         <td key={valueIndex} className="px-4 py-2">
-                          {value === null ? 'NULL' : String(value)}
+                          {value === null ? "NULL" : String(value)}
                         </td>
                       ))}
                     </tr>

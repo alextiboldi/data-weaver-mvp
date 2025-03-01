@@ -18,7 +18,7 @@ import {
   TooltipContent,
 } from "@radix-ui/react-tooltip";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TableDetailsProps {
   table: DBTable;
@@ -43,6 +43,21 @@ export function TableDetails({ table }: TableDetailsProps) {
       {}
     )
   );
+
+  useEffect(() => {
+    setColumnMetadata(
+      table.columns.reduce(
+        (acc, col) => ({
+          ...acc,
+          [col.id]: {
+            synonym: col.synonym || "",
+            description: col.description || "",
+          },
+        }),
+        {}
+      )
+    );
+  }, [table.columns]);
 
   const handleChange = () => {
     setHasChanges(true);
@@ -203,7 +218,7 @@ export function TableDetails({ table }: TableDetailsProps) {
                         <Input
                           placeholder="Enter synonym"
                           className="h-8"
-                          value={columnMetadata[column.id].synonym}
+                          value={columnMetadata[column.id]?.synonym || ""}
                           onChange={(e) =>
                             handleColumnChange(
                               column.id,
@@ -217,7 +232,7 @@ export function TableDetails({ table }: TableDetailsProps) {
                         <Input
                           placeholder="Enter description"
                           className="h-8"
-                          value={columnMetadata[column.id].description}
+                          value={columnMetadata[column.id]?.description || ""}
                           onChange={(e) =>
                             handleColumnChange(
                               column.id,

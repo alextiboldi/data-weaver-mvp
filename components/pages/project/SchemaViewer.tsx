@@ -87,7 +87,9 @@ export default function SchemaViewer({
         defaultNodes={nodes}
         defaultEdges={edges}
         nodeTypes={useMemo(() => getNodeTypes(searchResults), [searchResults])} // Memoizing function call
-        fitView
+        fitView={false}
+        maxZoom={5}
+        minZoom={0.1}
       >
         <Background />
       </ReactFlow>

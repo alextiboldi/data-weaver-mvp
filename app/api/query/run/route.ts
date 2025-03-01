@@ -1,8 +1,6 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { PrismaClient } from "@prisma/client";
-
+import { prisma } from "@/lib/prisma";
+import { Pool } from "pg";
 export async function POST(req: NextRequest) {
   try {
     const { projectId, query } = await req.json();
@@ -14,23 +12,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get project to retrieve connection config
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      select: { connectionConfig: true, dataSource: true },
+      include: {
+        tables: {
+          include: {
+            columns: true,
+          },
+        },
+      },
     });
 
     if (!project) {
-      return NextResponse.json(
-        { message: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
+
+    // Connect to the database
+    const pool = new Pool(project.connectionConfig);
+
+    const schema = "onesource";
+    const res = await pool.query(query);
+
+    console.log("Result", res.columns);
 
     // This is a simplified implementation
     // In a real app, you would use the connection config to connect to the DB
     // and execute the query safely
-    
+
     // For demo purposes, we'll return mock data
     // Replace this with actual query execution in production
     const mockResults = [
@@ -39,7 +47,7 @@ export async function POST(req: NextRequest) {
       { id: 3, name: "Sample Result 3", value: 300 },
     ];
 
-    // Simulate a delay for the query execution
+    // // Simulate a delay for the query execution
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     return NextResponse.json(mockResults);

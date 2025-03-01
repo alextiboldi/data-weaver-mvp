@@ -17,10 +17,13 @@ export function DatabaseSchemaNode({
   selected,
   searchResults,
 }: NodeProps<DatabaseSchemaNode> & { searchResults?: any[] }) {
-  const { setSelectedTable } = useStore();
+  const { setSelectedTable, setTableDetailDrawerOpen } = useStore();
 
   useEffect(() => {
-    if (selected) setSelectedTable(data.label);
+    if (selected) {
+      setSelectedTable(data.label);
+      setTableDetailDrawerOpen(true);
+    }
   }, [selected]);
 
   //find a value form the search array in the data.schema array

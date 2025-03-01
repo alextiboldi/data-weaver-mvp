@@ -2,7 +2,14 @@
 
 import { NewProjectWizard } from "@/components/NewProjectWizard";
 import AppInitializer from "@/components/app-initializer";
-import { Project, ProjectInfo, Column, Query, Relationship, Table } from "@/lib/types";
+import {
+  Project,
+  ProjectInfo,
+  Column,
+  Query,
+  Relationship,
+  Table,
+} from "@/lib/types";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
@@ -40,10 +47,14 @@ export default function DashboardPage() {
             (table: any): Table => ({
               id: table.id,
               name: table.name,
+              synonym: table.synonym,
+              description: table.description,
               columns: table.columns.map(
                 (column: any): Column => ({
                   id: column.id,
                   name: column.name,
+                  synonym: column.synonym,
+                  description: column.description,
                   type: column.type,
                   isPrimaryKey: column.isPrimaryKey,
                   comment: column.comment,

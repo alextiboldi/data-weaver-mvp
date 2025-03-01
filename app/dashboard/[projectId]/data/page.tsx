@@ -21,13 +21,19 @@ export default function DataPage({
 }: {
   params: { projectId: string };
 }) {
-  const { selectedProject, selectedTable } = useStore();
+  const {
+    selectedProject,
+    selectedTable,
+    tableDetailDrawerOpen,
+    setTableDetailDrawerOpen,
+  } = useStore();
   const [selectedTableForView, setSelectedTableForView] =
     useState<Table | null>(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [selectedTab, setSelectedTab] = useState("details");
+  const [dataIsLoading, setDataIsLoading] = useState(false);
 
   useEffect(() => {
     console.log("Table selected: ", selectedTable);
@@ -36,6 +42,7 @@ export default function DataPage({
       (table) => table.name === selectedTable
     );
     if (table) {
+      setSelectedTab("details");
       setSelectedTableForView(table);
     }
   }, [selectedTable]);
@@ -62,52 +69,64 @@ export default function DataPage({
     }
   };
 
-  // const handleTableClick = async (table: Table) => {
-  //   setSelectedTable(table);
-  //   try {
-  //     const response = await fetch(
-  //       `/api/projects/${params.projectId}/tables/${table.name}/data`
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch table data");
-  //     }
-  //     const { data } = await response.json();
-  //     setTableData(data);
-  //   } catch (error) {
-  //     console.error("Error fetching table data:", error);
-  //     setTableData([]);
-  //   }
-  // };
+  const onTabClick = async (tab: string) => {
+    setSelectedTab(tab);
+    if (tab === "data") {
+      console.log("Selected table: ", selectedTable);
+      if (!selectedTable) return;
+      try {
+        setDataIsLoading(true);
+        const response = await fetch(
+          `/api/projects/${params.projectId}/tables/${selectedTable}/data`
+        );
+        setDataIsLoading(false);
+        if (!response.ok) {
+          throw new Error("Failed to fetch table data");
+        }
+        const { data } = await response.json();
+        setTableData(data);
+      } catch (error) {
+        console.error("Error fetching table data:", error);
+        setTableData([]);
+      }
+    }
+  };
 
   if (!selectedProject) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 border-b">
-        <SearchBar onSearch={handleSearch} isLoading={isSearching} />
+    <div className="flex flex-col h-full w-full ">
+      {/* <div className="p-4 border-b">
+         <SearchBar onSearch={handleSearch} isLoading={isSearching} /> 
         {searchResults.length > 0 && (
           <div className="mt-2 text-sm text-muted-foreground">
             Found matches in {searchResults.length} tables
           </div>
         )}
-      </div>
-      <div className="flex-1 min-h-0">
+      </div> */}
+
+      <div className="h-full">
         <SchemaViewer project={selectedProject} searchResults={searchResults} />
       </div>
       <Collapsible
-        open={isDrawerOpen}
-        onOpenChange={setIsDrawerOpen}
+        open={tableDetailDrawerOpen}
+        onOpenChange={setTableDetailDrawerOpen}
         className="border-t bg-background"
       >
         <CollapsibleTrigger className="flex items-center justify-center w-full p-2 hover:bg-muted/50">
           <ChevronUp
             className={`h-4 w-4 transition-transform duration-200 ${
-              isDrawerOpen ? "" : "rotate-180"
+              tableDetailDrawerOpen ? "" : "rotate-180"
             }`}
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="h-[300px] overflow-auto">
-          <Tabs defaultValue="details" className="w-full h-full">
+          <Tabs
+            value={selectedTab}
+            defaultValue="details"
+            className="w-full h-full"
+            onValueChange={onTabClick}
+          >
             <TabsList className="px-4 pt-2">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="data">Data</TabsTrigger>
@@ -123,7 +142,11 @@ export default function DataPage({
                 )}
               </TabsContent>
               <TabsContent value="data">
-                {/* <TableDataViewer table={selectedTable} data={tableData} /> */}
+                <TableDataViewer
+                  isLoading={dataIsLoading}
+                  table={selectedTableForView}
+                  data={tableData}
+                />
               </TabsContent>
             </div>
           </Tabs>

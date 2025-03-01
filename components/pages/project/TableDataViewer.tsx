@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -8,13 +7,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Table as TableType } from "@/lib/types";
+import { Loader2 } from "lucide-react";
 
 interface TableDataViewerProps {
+  isLoading: boolean;
   table: TableType | null;
   data: any[];
 }
 
-export function TableDataViewer({ table, data }: TableDataViewerProps) {
+export function TableDataViewer({
+  table,
+  data,
+  isLoading,
+}: TableDataViewerProps) {
   if (!table) return null;
 
   return (
@@ -28,15 +33,21 @@ export function TableDataViewer({ table, data }: TableDataViewerProps) {
             ))}
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {data.map((row, i) => (
-            <TableRow key={i}>
-              {table.columns.map((column) => (
-                <TableCell key={column.id}>{row[column.name]}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          </div>
+        ) : (
+          <TableBody>
+            {data.map((row, i) => (
+              <TableRow key={i}>
+                {table.columns.map((column) => (
+                  <TableCell key={column.id}>{row[column.name]}</TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        )}
       </Table>
     </div>
   );

@@ -11,6 +11,9 @@ type Store = {
 
   selectedTable?: string;
   setSelectedTable: (table: string) => void;
+
+  tableDetailDrawerOpen: boolean;
+  setTableDetailDrawerOpen: (open: boolean) => void;
 };
 
 const useStore = create<Store>()(
@@ -27,6 +30,10 @@ const useStore = create<Store>()(
       selectedTable: "",
       setSelectedTable: (table) => {
         set({ selectedTable: table });
+      },
+      tableDetailDrawerOpen: false,
+      setTableDetailDrawerOpen: (open) => {
+        set({ tableDetailDrawerOpen: open });
       },
     }),
     {
