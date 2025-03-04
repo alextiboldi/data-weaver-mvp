@@ -25,6 +25,7 @@ export type TableRelation = {
 export type Query = {
   id: string;
   name: string;
+  description: string;
   query: string;
 };
 

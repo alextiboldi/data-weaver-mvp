@@ -1,11 +1,15 @@
-
 "use client";
 
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, FileText, MoreVertical } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  MoreVertical,
+} from "lucide-react";
 import { Query } from "@/lib/types";
 import {
   DropdownMenu,
@@ -16,18 +20,18 @@ import {
 
 interface SavedQueriesListProps {
   queries: Query[];
-  onSelectQuery: (query: Query) => void;
+
   onLoadQuery: (query: Query) => void;
   onEditQuery: (query: Query) => void;
   onDeleteQuery: (queryId: string) => void;
 }
 
-export function SavedQueriesList({ 
-  queries, 
-  onSelectQuery, 
-  onLoadQuery, 
-  onEditQuery, 
-  onDeleteQuery 
+export function SavedQueriesList({
+  queries,
+
+  onLoadQuery,
+  onEditQuery,
+  onDeleteQuery,
 }: SavedQueriesListProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -74,10 +78,7 @@ export function SavedQueriesList({
                   key={query.id}
                   className="p-3 rounded-md border hover:bg-muted/50 cursor-pointer transition-colors flex justify-between items-start"
                 >
-                  <div 
-                    className="flex-1" 
-                    onClick={() => onSelectQuery(query)}
-                  >
+                  <div className="flex-1">
                     <h3 className="font-medium text-sm">{query.name}</h3>
                     {query.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
@@ -98,7 +99,7 @@ export function SavedQueriesList({
                       <DropdownMenuItem onClick={() => onLoadQuery(query)}>
                         Load
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => onDeleteQuery(query.id)}
                         className="text-destructive"
                       >
