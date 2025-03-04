@@ -44,6 +44,7 @@ export default function QueryPage({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newQueryTitle, setNewQueryTitle] = useState("");
   const [newQueryDescription, setNewQueryDescription] = useState("");
+  const [editingQueryId, setEditingQueryId] = useState<string | null>(null);
 
   // Fetch saved queries when component mounts
   useEffect(() => {
@@ -97,24 +98,26 @@ export default function QueryPage({
   };
 
   const handleSaveQuery = async () => {
-    if (!selectedText.trim() || !newQueryTitle.trim()) return;
+    if ((!selectedText.trim() && !editingQueryId) || !newQueryTitle.trim()) return;
 
     try {
-      const response = await fetch(
-        `/api/projects/${params.projectId}/queries/save`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            projectId: params.projectId,
-            name: newQueryTitle,
-            description: newQueryDescription,
-            query: selectedText,
-          }),
-        }
-      );
+      const method = editingQueryId ? "PUT" : "POST";
+      const endpoint = editingQueryId 
+        ? `/api/projects/${params.projectId}/queries/${editingQueryId}` 
+        : `/api/projects/${params.projectId}/queries/save`;
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectId: params.projectId,
+          name: newQueryTitle,
+          description: newQueryDescription,
+          query: selectedText || currentQuery, // Use selected text or current query if editing
+        }),
+      });
 
       if (response.ok) {
         // Refresh the list of saved queries
@@ -122,6 +125,7 @@ export default function QueryPage({
         // Reset form fields
         setNewQueryTitle("");
         setNewQueryDescription("");
+        setEditingQueryId(null);
         setIsDialogOpen(false);
       }
     } catch (error) {
@@ -132,6 +136,34 @@ export default function QueryPage({
   const handleSelectQuery = (query: Query) => {
     setCurrentQuery(query.query);
   };
+  
+  const handleEditQuery = (query: Query) => {
+    setEditingQueryId(query.id);
+    setNewQueryTitle(query.name);
+    setNewQueryDescription(query.description || "");
+    setIsDialogOpen(true);
+  };
+  
+  const handleLoadQuery = (query: Query) => {
+    const queryWithComment = `-- ${query.name}\n${query.query}`;
+    setCurrentQuery(currentQuery + (currentQuery ? "\n\n" : "") + queryWithComment);
+  };
+  
+  const handleDeleteQuery = async (queryId: string) => {
+    if (!confirm("Are you sure you want to delete this query?")) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${params.projectId}/queries/${queryId}`, {
+        method: "DELETE",
+      });
+      
+      if (response.ok) {
+        fetchSavedQueries();
+      }
+    } catch (error) {
+      console.error("Failed to delete query:", error);
+    }
+  };
 
   return (
     <div className="flex h-full">
@@ -139,6 +171,9 @@ export default function QueryPage({
       <SavedQueriesList
         queries={savedQueries}
         onSelectQuery={handleSelectQuery}
+        onEditQuery={handleEditQuery}
+        onLoadQuery={handleLoadQuery}
+        onDeleteQuery={handleDeleteQuery}
       />
 
       {/* Main Content */}
@@ -159,9 +194,11 @@ export default function QueryPage({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Save Query</DialogTitle>
+                  <DialogTitle>{editingQueryId ? "Edit Query" : "Save Query"}</DialogTitle>
                   <DialogDescription>
-                    Save your selected query text for future use.
+                    {editingQueryId 
+                      ? "Edit your saved query" 
+                      : "Save your selected query text for future use."}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -193,9 +230,9 @@ export default function QueryPage({
                   </Button>
                   <Button 
                     onClick={handleSaveQuery}
-                    disabled={!selectedText.trim() || !newQueryTitle.trim()}
+                    disabled={(editingQueryId ? false : !selectedText.trim()) || !newQueryTitle.trim()}
                   >
-                    Save
+                    {editingQueryId ? "Update" : "Save"}
                   </Button>
                 </DialogFooter>
               </DialogContent>

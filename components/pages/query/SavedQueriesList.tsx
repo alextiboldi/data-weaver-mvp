@@ -5,15 +5,30 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, MoreVertical } from "lucide-react";
 import { Query } from "@/lib/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SavedQueriesListProps {
   queries: Query[];
   onSelectQuery: (query: Query) => void;
+  onLoadQuery: (query: Query) => void;
+  onEditQuery: (query: Query) => void;
+  onDeleteQuery: (queryId: string) => void;
 }
 
-export function SavedQueriesList({ queries, onSelectQuery }: SavedQueriesListProps) {
+export function SavedQueriesList({ 
+  queries, 
+  onSelectQuery, 
+  onLoadQuery, 
+  onEditQuery, 
+  onDeleteQuery 
+}: SavedQueriesListProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -57,15 +72,40 @@ export function SavedQueriesList({ queries, onSelectQuery }: SavedQueriesListPro
               queries.map((query) => (
                 <div
                   key={query.id}
-                  className="p-3 rounded-md border hover:bg-muted/50 cursor-pointer transition-colors"
-                  onClick={() => onSelectQuery(query)}
+                  className="p-3 rounded-md border hover:bg-muted/50 cursor-pointer transition-colors flex justify-between items-start"
                 >
-                  <h3 className="font-medium text-sm">{query.name}</h3>
-                  {query.description && (
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
-                      {query.description}
-                    </p>
-                  )}
+                  <div 
+                    className="flex-1" 
+                    onClick={() => onSelectQuery(query)}
+                  >
+                    <h3 className="font-medium text-sm">{query.name}</h3>
+                    {query.description && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                        {query.description}
+                      </p>
+                    )}
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onEditQuery(query)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onLoadQuery(query)}>
+                        Load
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onDeleteQuery(query.id)}
+                        className="text-destructive"
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ))
             )}
