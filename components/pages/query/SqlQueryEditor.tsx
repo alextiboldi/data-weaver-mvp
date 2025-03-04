@@ -33,9 +33,7 @@ export function SqlQueryEditor({
   const handleSelectionUpdate = (viewUpdate: any) => {
     if (viewUpdate.selectionSet) {
       const state = viewUpdate.state;
-      const selection = state.main;
-      console.log(state);
-      if (!selection) return;
+      const selection = state.selection.main;
       if (selection.from !== selection.to) {
         const selectedText = state.sliceDoc(selection.from, selection.to);
         onSelectionChange(selectedText);
