@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     // Get table list and column information
     const tableInfoQuery = `
     SELECT 
-    c.table_name,
+     c.table_name as table_name,
     c.column_name,
     c.data_type,
     CASE 
@@ -71,12 +71,27 @@ LEFT JOIN information_schema.key_column_usage kcu2
     ON rc.unique_constraint_name = kcu2.constraint_name
 LEFT JOIN pg_catalog.pg_description col_desc 
     ON col_desc.objsubid = c.ordinal_position
-    AND col_desc.objoid = (SELECT oid FROM pg_class WHERE relname = c.table_name)
+    AND col_desc.objoid = (
+        SELECT pg_class.oid 
+        FROM pg_catalog.pg_class
+        JOIN pg_catalog.pg_namespace ns ON pg_class.relnamespace = ns.oid
+        WHERE pg_class.relname = c.table_name 
+        AND ns.nspname = c.table_schema
+        LIMIT 1  -- Ensure only one row is returned
+    )
 LEFT JOIN pg_catalog.pg_description tbl_desc 
     ON tbl_desc.objsubid = 0
-    AND tbl_desc.objoid = (SELECT oid FROM pg_class WHERE relname = c.table_name)
+    AND tbl_desc.objoid = (
+        SELECT pg_class.oid 
+        FROM pg_catalog.pg_class
+        JOIN pg_catalog.pg_namespace ns ON pg_class.relnamespace = ns.oid
+        WHERE pg_class.relname = c.table_name 
+        AND ns.nspname = c.table_schema
+        LIMIT 1  -- Ensure only one row is returned
+    )
 WHERE c.table_schema = $1
 ORDER BY c.table_name, c.ordinal_position;
+
   `;
     const result = await client.query(tableInfoQuery, [
       data.connection.schema || "public",

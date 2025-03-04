@@ -137,10 +137,6 @@ export default function QueryPage({
     }
   };
 
-  const handleSelectQuery = (query: Query) => {
-    setCurrentQuery(query.query);
-  };
-
   const handleEditQuery = (query: Query) => {
     setEditingQueryId(query.id);
     setNewQueryTitle(query.name);
@@ -179,7 +175,6 @@ export default function QueryPage({
       {/* Saved Queries Panel */}
       <SavedQueriesList
         queries={savedQueries}
-        onSelectQuery={handleSelectQuery}
         onEditQuery={handleEditQuery}
         onLoadQuery={handleLoadQuery}
         onDeleteQuery={handleDeleteQuery}
