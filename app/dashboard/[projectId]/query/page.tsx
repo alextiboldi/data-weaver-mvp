@@ -37,6 +37,7 @@ export default function QueryPage({
 }) {
   const { selectedProject } = useStore();
   const [currentQuery, setCurrentQuery] = useState("");
+  const [selectedText, setSelectedText] = useState("");
   const [savedQueries, setSavedQueries] = useState<Query[]>([]);
   const [queryResults, setQueryResults] = useState<any[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +65,7 @@ export default function QueryPage({
   };
 
   const handleRunQuery = async () => {
-    if (!currentQuery.trim()) return;
+    if (!selectedText.trim()) return;
 
     setIsLoading(true);
     try {
@@ -75,7 +76,7 @@ export default function QueryPage({
         },
         body: JSON.stringify({
           projectId: params.projectId,
-          query: currentQuery,
+          query: selectedText,
         }),
       });
 
@@ -192,7 +193,7 @@ export default function QueryPage({
             </Dialog>
             <Button
               onClick={handleRunQuery}
-              disabled={isLoading}
+              disabled={isLoading || !selectedText.trim()}
               className="gap-2"
             >
               {isLoading ? (
@@ -208,7 +209,18 @@ export default function QueryPage({
         </div>
 
         {/* Query Editor */}
-        <SqlQueryEditor value={currentQuery} onChange={setCurrentQuery} />
+        <div className="space-y-2">
+          <SqlQueryEditor 
+            value={currentQuery} 
+            onChange={setCurrentQuery} 
+            onSelectionChange={setSelectedText} 
+          />
+          <p className="text-xs text-muted-foreground italic">
+            {selectedText.trim() 
+              ? "Selected text will be executed" 
+              : "Select text in the editor to enable query execution"}
+          </p>
+        </div>
 
         {/* Results Section */}
         <div className="mt-6">

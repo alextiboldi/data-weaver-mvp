@@ -5,18 +5,33 @@ import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView } from "@codemirror/view";
+import { StateEffect, EditorState } from "@codemirror/state";
 
 interface SqlQueryEditorProps {
   value: string;
   onChange: (value: string) => void;
+  onSelectionChange: (selection: string) => void;
 }
 
-export function SqlQueryEditor({ value, onChange }: SqlQueryEditorProps) {
+export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleSelectionUpdate = (viewUpdate: any) => {
+    if (viewUpdate.selectionSet) {
+      const state = viewUpdate.state;
+      const selection = state.selection.main;
+      if (selection.from !== selection.to) {
+        const selectedText = state.sliceDoc(selection.from, selection.to);
+        onSelectionChange(selectedText);
+      } else {
+        onSelectionChange("");
+      }
+    }
+  };
 
   if (!isMounted) {
     return (
@@ -30,9 +45,9 @@ export function SqlQueryEditor({ value, onChange }: SqlQueryEditorProps) {
         value={value}
         height="200px"
         theme={vscodeLight}
-        extensions={[sql(), EditorView.lineWrapping]}
+        extensions={[sql(), EditorView.lineWrapping, EditorView.updateListener.of(handleSelectionUpdate)]}
         onChange={onChange}
-        placeholder="Enter your SQL query here..."
+        placeholder="Enter your SQL query here and select text to run..."
         basicSetup={{
           lineNumbers: true,
           highlightActiveLine: true,
