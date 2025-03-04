@@ -97,7 +97,7 @@ export default function QueryPage({
   };
 
   const handleSaveQuery = async () => {
-    if (!currentQuery.trim() || !newQueryTitle.trim()) return;
+    if (!selectedText.trim() || !newQueryTitle.trim()) return;
 
     try {
       const response = await fetch(
@@ -111,7 +111,7 @@ export default function QueryPage({
             projectId: params.projectId,
             name: newQueryTitle,
             description: newQueryDescription,
-            query: currentQuery,
+            query: selectedText,
           }),
         }
       );
@@ -148,7 +148,11 @@ export default function QueryPage({
           <div className="space-x-2">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  disabled={!selectedText.trim()}
+                >
                   <Save className="h-4 w-4" />
                   Save
                 </Button>
@@ -157,7 +161,7 @@ export default function QueryPage({
                 <DialogHeader>
                   <DialogTitle>Save Query</DialogTitle>
                   <DialogDescription>
-                    Save your current query for future use.
+                    Save your selected query text for future use.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -187,7 +191,12 @@ export default function QueryPage({
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleSaveQuery}>Save</Button>
+                  <Button 
+                    onClick={handleSaveQuery}
+                    disabled={!selectedText.trim() || !newQueryTitle.trim()}
+                  >
+                    Save
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
