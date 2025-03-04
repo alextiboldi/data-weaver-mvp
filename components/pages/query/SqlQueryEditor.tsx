@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,7 +5,11 @@ import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView } from "@codemirror/view";
-import { autocompletion, CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import {
+  autocompletion,
+  CompletionContext,
+  CompletionResult,
+} from "@codemirror/autocomplete";
 import useStore from "@/store/app-store";
 
 interface SqlQueryEditorProps {
@@ -15,10 +18,14 @@ interface SqlQueryEditorProps {
   onSelectionChange: (selection: string) => void;
 }
 
-export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryEditorProps) {
+export function SqlQueryEditor({
+  value,
+  onChange,
+  onSelectionChange,
+}: SqlQueryEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { selectedProject } = useStore();
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -27,6 +34,8 @@ export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryE
     if (viewUpdate.selectionSet) {
       const state = viewUpdate.state;
       const selection = state.main;
+      console.log(state);
+      if (!selection) return;
       if (selection.from !== selection.to) {
         const selectedText = state.sliceDoc(selection.from, selection.to);
         onSelectionChange(selectedText);
@@ -37,28 +46,30 @@ export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryE
   };
 
   // SQL autocomplete function based on project data
-  const sqlCompletions = (context: CompletionContext): CompletionResult | null => {
+  const sqlCompletions = (
+    context: CompletionContext
+  ): CompletionResult | null => {
     if (!selectedProject) return null;
-    
+
     const word = context.matchBefore(/\w*/);
     if (!word || word.from === word.to) return null;
-    
-    const tableSuggestions = selectedProject.tables.map(table => ({
+
+    const tableSuggestions = selectedProject.tables.map((table) => ({
       label: table.name,
       type: "keyword",
       detail: "table",
       info: table.comment || table.description || "Table",
     }));
-    
-    const columnSuggestions = selectedProject.tables.flatMap(table => 
-      table.columns.map(column => ({
+
+    const columnSuggestions = selectedProject.tables.flatMap((table) =>
+      table.columns.map((column) => ({
         label: column.name,
         type: "property",
         detail: `${table.name}.${column.type}`,
         info: column.comment || column.description || "Column",
       }))
     );
-    
+
     const sqlKeywords = [
       { label: "SELECT", type: "keyword" },
       { label: "FROM", type: "keyword" },
@@ -76,9 +87,21 @@ export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryE
       { label: "MIN", type: "function" },
       { label: "MAX", type: "function" },
     ];
-    
-    const options = [...tableSuggestions, ...columnSuggestions, ...sqlKeywords];
-    
+
+    const schema = {
+      label: selectedProject.connectionConfig.schema || "public",
+      type: "property",
+      detail: "schema",
+      info: "Schema",
+    };
+    console.log(selectedProject.connectionConfig.schema);
+    const options = [
+      schema,
+      ...tableSuggestions,
+      ...columnSuggestions,
+      ...sqlKeywords,
+    ];
+
     return {
       from: word.from,
       options,
@@ -99,10 +122,10 @@ export function SqlQueryEditor({ value, onChange, onSelectionChange }: SqlQueryE
         height="200px"
         theme={vscodeLight}
         extensions={[
-          sql(), 
-          EditorView.lineWrapping, 
+          sql(),
+          EditorView.lineWrapping,
           EditorView.updateListener.of(handleSelectionUpdate),
-          autocompletion({ override: [sqlCompletions] })
+          autocompletion({ override: [sqlCompletions] }),
         ]}
         onChange={onChange}
         placeholder="Enter your SQL query here and select text to run..."
