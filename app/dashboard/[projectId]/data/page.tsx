@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronUp } from "lucide-react";
 import { TableDetails } from "@/components/pages/dictionary/TableDetails";
+import { SearchDrawer } from "@/components/pages/data/SearchDrawer";
 
 export default function DataPage({
   params,
@@ -96,14 +97,7 @@ export default function DataPage({
 
   return (
     <div className="flex flex-col h-full w-full ">
-      {/* <div className="p-4 border-b">
-         <SearchBar onSearch={handleSearch} isLoading={isSearching} /> 
-        {searchResults.length > 0 && (
-          <div className="mt-2 text-sm text-muted-foreground">
-            Found matches in {searchResults.length} tables
-          </div>
-        )}
-      </div> */}
+      <SearchDrawer projectId={params.projectId} />
 
       <div className="h-full">
         <SchemaViewer project={selectedProject} searchResults={searchResults} />
