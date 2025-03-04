@@ -1,3 +1,35 @@
+
+@keyframes collapsibleOpen {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 20rem;
+    opacity: 1;
+  }
+}
+
+@keyframes collapsibleClose {
+  from {
+    width: 20rem;
+    opacity: 1;
+  }
+  to {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+.animate-collapsibleOpen {
+  animation: collapsibleOpen 200ms ease-out;
+}
+
+.animate-collapsibleClose {
+  animation: collapsibleClose 200ms ease-in;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

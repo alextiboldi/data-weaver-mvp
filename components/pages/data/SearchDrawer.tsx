@@ -44,25 +44,28 @@ export function SearchDrawer({ projectId }: SearchDrawerProps) {
   };
 
   return (
-    <Collapsible
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      className="fixed left-0 top-1/4 z-40 bg-background border rounded-r-md shadow-md"
-    >
-      <CollapsibleTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute -right-8 top-2 p-1 h-8 w-8 rounded-full"
-        >
-          <ChevronRight
-            className={`h-4 w-4 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="w-80 max-h-[60vh] flex flex-col">
+    <div className="fixed left-0 top-1/4 z-40 flex">
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className="bg-background border rounded-r-md shadow-md"
+      >
+        <div className="relative">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute -right-8 top-2 p-1 h-8 w-8 rounded-full"
+            >
+              <ChevronRight
+                className={`h-4 w-4 transition-transform duration-200 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+        <CollapsibleContent className="w-80 max-h-[60vh] flex flex-col data-[state=closed]:animate-collapsibleClose data-[state=open]:animate-collapsibleOpen">
         <div className="p-4 border-b">
           <h3 className="text-lg font-medium mb-2">Search Database</h3>
           <SearchBar onSearch={handleSearch} isLoading={isSearching} />
