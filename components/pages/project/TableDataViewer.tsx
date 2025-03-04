@@ -38,7 +38,7 @@ export function TableDataViewer({
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
           </div>
         ) : (
-          <TableBody>
+          <TableBody className="overflow-auto">
             {data.map((row, i) => (
               <TableRow key={i}>
                 {table.columns.map((column) => (

@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,12 +12,7 @@ import {
   Table,
 } from "@/components/ui/table";
 import { Table as DBTable } from "@/lib/types";
-
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@radix-ui/react-tooltip";
+import useStore from "@/store/app-store";
 
 import { useEffect, useState } from "react";
 
@@ -25,6 +21,7 @@ interface TableDetailsProps {
 }
 
 export function TableDetails({ table }: TableDetailsProps) {
+  const { currentProject } = useStore();
   const [isSaving, setIsSaving] = useState(false);
   const [tableSynonym, setTableSynonym] = useState(table.synonym || "");
   const [tableDescription, setTableDescription] = useState(
@@ -92,15 +89,18 @@ export function TableDetails({ table }: TableDetailsProps) {
 
   const updateTableMetadata = async () => {
     try {
-      await fetch("/api/dictionary/update-table", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tableId: table.id,
-          synonym: tableSynonym,
-          description: tableDescription,
-        }),
-      });
+      await fetch(
+        `/api/projects/${currentProject.id}/dictionary/update-table`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tableId: table.id,
+            synonym: tableSynonym,
+            description: tableDescription,
+          }),
+        }
+      );
     } catch (error) {
       console.error("Failed to update table metadata:", error);
     }
@@ -108,13 +108,16 @@ export function TableDetails({ table }: TableDetailsProps) {
 
   const updateAllColumnMetadata = async () => {
     try {
-      await fetch("/api/dictionary/update-column", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          columns: columnMetadata,
-        }),
-      });
+      await fetch(
+        `/api/projects/${currentProject.id}/dictionary/update-column`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            columns: columnMetadata,
+          }),
+        }
+      );
     } catch (error) {
       console.error("Failed to update column metadata:", error);
     }

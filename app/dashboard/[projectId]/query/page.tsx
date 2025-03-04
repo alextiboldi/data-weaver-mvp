@@ -21,6 +21,14 @@ import { SqlQueryEditor } from "@/components/pages/query/SqlQueryEditor";
 import { SavedQueriesList } from "@/components/pages/query/SavedQueriesList";
 import useStore from "@/store/app-store";
 import { Query } from "@/lib/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function QueryPage({
   params,
@@ -220,29 +228,32 @@ export default function QueryPage({
               {queryResults[0].error}
             </div>
           ) : (
-            <div className="overflow-x-auto border rounded-md">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-muted">
+            <div className="overflow-auto border rounded-md">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow className="bg-muted">
                     {Object.keys(queryResults[0]).map((key) => (
-                      <th key={key} className="px-4 py-2 text-left font-medium">
+                      <TableHead
+                        key={key}
+                        className="px-4 py-2 text-left font-medium"
+                      >
                         {key}
-                      </th>
+                      </TableHead>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {queryResults.map((row, rowIndex) => (
-                    <tr key={rowIndex} className="border-t">
+                    <TableRow key={rowIndex} className="border-t">
                       {Object.values(row).map((value: any, valueIndex) => (
-                        <td key={valueIndex} className="px-4 py-2">
+                        <TableCell key={valueIndex} className="px-4 py-2">
                           {value === null ? "NULL" : String(value)}
-                        </td>
+                        </TableCell>
                       ))}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </div>

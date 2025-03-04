@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import { vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView } from "@codemirror/view";
 
 interface SqlQueryEditorProps {
@@ -30,7 +29,7 @@ export function SqlQueryEditor({ value, onChange }: SqlQueryEditorProps) {
       <CodeMirror
         value={value}
         height="200px"
-        theme={vscodeDark}
+        theme={vscodeLight}
         extensions={[sql(), EditorView.lineWrapping]}
         onChange={onChange}
         placeholder="Enter your SQL query here..."

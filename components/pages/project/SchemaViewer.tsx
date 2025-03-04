@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Background, Edge, ReactFlow } from "@xyflow/react";
+import {
+  Background,
+  BackgroundVariant,
+  Controls,
+  Edge,
+  MiniMap,
+  ReactFlow,
+} from "@xyflow/react";
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import "@xyflow/react/dist/style.css";
 import { Project } from "@/lib/types";
@@ -91,7 +98,8 @@ export default function SchemaViewer({
         maxZoom={5}
         minZoom={0.1}
       >
-        <Background />
+        <Background color="#cccc" variant={BackgroundVariant.Cross} />
+        <Controls />
       </ReactFlow>
     </div>
   );

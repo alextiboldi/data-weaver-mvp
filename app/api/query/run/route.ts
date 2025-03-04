@@ -33,28 +33,11 @@ export async function POST(req: NextRequest) {
     const schema = "onesource";
     const res = await pool.query(query);
 
-    console.log("Result", res.columns);
-
-    // This is a simplified implementation
-    // In a real app, you would use the connection config to connect to the DB
-    // and execute the query safely
-
-    // For demo purposes, we'll return mock data
-    // Replace this with actual query execution in production
-    const mockResults = [
-      { id: 1, name: "Sample Result 1", value: 100 },
-      { id: 2, name: "Sample Result 2", value: 200 },
-      { id: 3, name: "Sample Result 3", value: 300 },
-    ];
-
-    // // Simulate a delay for the query execution
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return NextResponse.json(mockResults);
+    return NextResponse.json(res.rows);
   } catch (error) {
     console.error("Error running query:", error);
     return NextResponse.json(
-      { message: "Failed to run query" },
+      { message: `Failed to run query: ${error.message} ` },
       { status: 500 }
     );
   }
