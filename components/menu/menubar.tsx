@@ -23,11 +23,14 @@ import {
   LogOutIcon,
   MessageSquareIcon,
   StarIcon,
+  PlusIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useRouter } from "next/navigation";
 import useStore from "@/store/app-store";
 import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { NewProjectWizard } from "@/components/NewProjectWizard";
 
 type Props = {};
 
@@ -62,7 +65,17 @@ const MenuBar = (props: Props) => {
               </MenubarSubContent>
             </MenubarSub>
             <MenubarSeparator />
-            <MenubarItem>New Project</MenubarItem>
+            <Dialog>
+              <DialogTrigger asChild>
+                <MenubarItem onSelect={(e) => e.preventDefault()}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  New Project
+                </MenubarItem>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl">
+                <NewProjectWizard />
+              </DialogContent>
+            </Dialog>
             <MenubarSeparator />
             <MenubarItem>Settings</MenubarItem>
           </MenubarContent>
