@@ -1,6 +1,5 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // Update a query
 export async function PUT(
@@ -17,7 +16,7 @@ export async function PUT(
       );
     }
 
-    const updatedQuery = await prisma.savedQuery.update({
+    const updatedQuery = await prisma.query.update({
       where: {
         id: params.queryId,
       },
@@ -44,7 +43,7 @@ export async function DELETE(
   { params }: { params: { projectId: string; queryId: string } }
 ) {
   try {
-    await prisma.savedQuery.delete({
+    await prisma.query.delete({
       where: {
         id: params.queryId,
       },

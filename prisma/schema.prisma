@@ -168,6 +168,7 @@ model Query {
   id        String   @id @default(cuid())
   name      String
   query     String
+  description String?
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   createdAt DateTime @default(now())

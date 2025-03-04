@@ -70,16 +70,19 @@ export default function QueryPage({
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/query/run`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          projectId: params.projectId,
-          query: selectedText,
-        }),
-      });
+      const response = await fetch(
+        `/api/projects/${params.projectId}/queries/run`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            projectId: params.projectId,
+            query: selectedText,
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -98,12 +101,13 @@ export default function QueryPage({
   };
 
   const handleSaveQuery = async () => {
-    if ((!selectedText.trim() && !editingQueryId) || !newQueryTitle.trim()) return;
+    if ((!selectedText.trim() && !editingQueryId) || !newQueryTitle.trim())
+      return;
 
     try {
       const method = editingQueryId ? "PUT" : "POST";
-      const endpoint = editingQueryId 
-        ? `/api/projects/${params.projectId}/queries/${editingQueryId}` 
+      const endpoint = editingQueryId
+        ? `/api/projects/${params.projectId}/queries/${editingQueryId}`
         : `/api/projects/${params.projectId}/queries/save`;
 
       const response = await fetch(endpoint, {
@@ -136,27 +140,32 @@ export default function QueryPage({
   const handleSelectQuery = (query: Query) => {
     setCurrentQuery(query.query);
   };
-  
+
   const handleEditQuery = (query: Query) => {
     setEditingQueryId(query.id);
     setNewQueryTitle(query.name);
     setNewQueryDescription(query.description || "");
     setIsDialogOpen(true);
   };
-  
+
   const handleLoadQuery = (query: Query) => {
     const queryWithComment = `-- ${query.name}\n${query.query}`;
-    setCurrentQuery(currentQuery + (currentQuery ? "\n\n" : "") + queryWithComment);
+    setCurrentQuery(
+      currentQuery + (currentQuery ? "\n\n" : "") + queryWithComment
+    );
   };
-  
+
   const handleDeleteQuery = async (queryId: string) => {
     if (!confirm("Are you sure you want to delete this query?")) return;
-    
+
     try {
-      const response = await fetch(`/api/projects/${params.projectId}/queries/${queryId}`, {
-        method: "DELETE",
-      });
-      
+      const response = await fetch(
+        `/api/projects/${params.projectId}/queries/${queryId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       if (response.ok) {
         fetchSavedQueries();
       }
@@ -183,8 +192,8 @@ export default function QueryPage({
           <div className="space-x-2">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="gap-2"
                   disabled={!selectedText.trim()}
                 >
@@ -194,10 +203,12 @@ export default function QueryPage({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{editingQueryId ? "Edit Query" : "Save Query"}</DialogTitle>
+                  <DialogTitle>
+                    {editingQueryId ? "Edit Query" : "Save Query"}
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingQueryId 
-                      ? "Edit your saved query" 
+                    {editingQueryId
+                      ? "Edit your saved query"
                       : "Save your selected query text for future use."}
                   </DialogDescription>
                 </DialogHeader>
@@ -228,9 +239,12 @@ export default function QueryPage({
                   >
                     Cancel
                   </Button>
-                  <Button 
+                  <Button
                     onClick={handleSaveQuery}
-                    disabled={(editingQueryId ? false : !selectedText.trim()) || !newQueryTitle.trim()}
+                    disabled={
+                      (editingQueryId ? false : !selectedText.trim()) ||
+                      !newQueryTitle.trim()
+                    }
                   >
                     {editingQueryId ? "Update" : "Save"}
                   </Button>
@@ -256,14 +270,14 @@ export default function QueryPage({
 
         {/* Query Editor */}
         <div className="space-y-2">
-          <SqlQueryEditor 
-            value={currentQuery} 
-            onChange={setCurrentQuery} 
-            onSelectionChange={setSelectedText} 
+          <SqlQueryEditor
+            value={currentQuery}
+            onChange={setCurrentQuery}
+            onSelectionChange={setSelectedText}
           />
           <p className="text-xs text-muted-foreground italic">
-            {selectedText.trim() 
-              ? "Selected text will be executed" 
+            {selectedText.trim()
+              ? "Selected text will be executed"
               : "Select text in the editor to enable query execution"}
           </p>
         </div>
